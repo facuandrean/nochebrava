@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    // Environment setup & latest features
+    "lib": [
+      "ESNext"
+    ],
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "allowJs": true,
+    // Bundler mode
+    "outDir": "./dist", // Es donde va a poner los archivos compilados de ts. Generalmente también podría ser “./build”
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
+    "verbatimModuleSyntax": true,
+    "noEmit": false, // Esto si está en true no genera archivos compilados (.js).
+    // Best practices
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true, // Esto hace que nos avise si tenemos un case sin un break, siempre debería de tenerlo.
+    "noUncheckedIndexedAccess": true,
+    // Some stricter flags (disabled by default)
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noImplicitReturns": true, // Esto hace que nos avise si no tenemos un return en una función, siempre debería de tenerlo.
+    // Agregados.
+    "resolveJsonModule": true,
+  }
+}

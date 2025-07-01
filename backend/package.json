@@ -1,0 +1,39 @@
+{
+  "name": "backend",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "hot": "bun run src/index.ts --hot",
+    "dev": "bun run src/index.ts",
+    "build": "bun build src/index.ts --outdir dist",
+    "start": "node dist/index.js",
+    "lint": "bunx eslint . --ext .ts",
+    "lint:fix": "bunx eslint . --ext .ts --fix",
+    "check:types": "bunx tsc --noEmit"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.30.0",
+    "@types/bun": "latest",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.8",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
+    "eslint": "^9.30.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-base-typescript": "^1.1.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "globals": "^16.2.0",
+    "typescript-eslint": "^8.35.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "valibot": "^1.1.0"
+  }
+}
