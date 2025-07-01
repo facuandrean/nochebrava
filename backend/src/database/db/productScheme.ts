@@ -6,7 +6,8 @@ export const products = sqliteTable("products", {
   name: text("name").notNull(),
   description: text("description"),
   price: real("price").notNull(),
-  stock: integer("stock").notNull(),
+  stock: integer("stock"),
+  active: integer("active", { mode: "boolean" }).notNull().default(true),
   created_at: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   updated_at: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 })
