@@ -1,5 +1,14 @@
 import { boolean, minLength, minValue, number, object, optional, pipe, string } from "valibot";
 
+/**
+ * Schema to validate the product post request.
+ * @property {string} name - The product name.
+ * @property {string} description - The product description.
+ * @property {number} price - The product price.
+ * @property {number} stock - The product stock.
+ * @property {string} picture - The product picture.
+ * @property {boolean} active - The product active.
+ */
 export const productPostSchema = object({
   name: pipe(
     string(),
@@ -23,6 +32,16 @@ export const productPostSchema = object({
   active: boolean()
 });
 
+
+/**
+ * Schema to validate the product update request.
+ * @property {string} name - The product name.
+ * @property {string} description - The product description.
+ * @property {number} price - The product price.
+ * @property {number} stock - The product stock.
+ * @property {string} picture - The product picture.
+ * @property {boolean} active - The product active.
+ */
 export const productUpdateSchema = object({
   name: optional(
     pipe(

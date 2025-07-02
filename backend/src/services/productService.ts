@@ -5,7 +5,10 @@ import { AppError } from "../errors";
 import type { Product, ProductBodyUpdate, ProductWithoutId } from "../types/types";
 import { v4 as uuid } from "uuid";
 
-
+/**
+ * Get all products.
+ * @returns - An array of products.
+ */
 const getProducts = async (): Promise<Product[]> => {
   try {
     const allProducts: Product[] = await db.select().from(products).all();
@@ -15,6 +18,12 @@ const getProducts = async (): Promise<Product[]> => {
   }
 };
 
+
+/**
+ * Get a product by id.
+ * @param id_product - The id of the product.
+ * @returns - The product.
+ */
 const getProductById = async (id_product: string): Promise<Product | undefined> => {
   try {
     const product: Product | undefined = await db.select().from(products).where(eq(products.product_id, id_product)).get();
@@ -25,6 +34,11 @@ const getProductById = async (id_product: string): Promise<Product | undefined> 
   }
 };
 
+/**
+ * Create a new product.
+ * @param dataProduct - The data of the product.
+ * @returns - The product.
+ */
 const postProduct = async (dataProduct: ProductWithoutId): Promise<Product> => {
   try {
     const newProduct = {
@@ -39,6 +53,12 @@ const postProduct = async (dataProduct: ProductWithoutId): Promise<Product> => {
   }
 };
 
+/**
+ * Update a product.
+ * @param id_product - The id of the product.
+ * @param dataProduct - The data of the product.
+ * @returns - The product.
+ */
 const patchProduct = async (id_product: string, dataProduct: ProductBodyUpdate): Promise<Product> => {
   try {
     const updatedProduct = db.update(products).set(dataProduct).where(eq(products.product_id, id_product)).returning().get();
@@ -48,6 +68,11 @@ const patchProduct = async (id_product: string, dataProduct: ProductBodyUpdate):
   }
 };
 
+/**
+ * Delete a product.
+ * @param id_product - The id of the product.
+ * @returns - The product.
+ */
 const deleteProduct = async (id_product: string): Promise<void> => {
   try {
     await db.delete(products).where(eq(products.product_id, id_product));
