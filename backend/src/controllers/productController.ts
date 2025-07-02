@@ -4,6 +4,13 @@ import type { Product, ProductBodyPost, ProductBodyUpdate, ProductWithoutId } fr
 import { AppError } from "../errors";
 import { getCurrentDate } from "../utils/date";
 
+
+/**
+ * Get all products. Call the service to get all products.
+ * @param _req - The request object.
+ * @param res - The response object.
+ * @returns - The response object.
+ */
 const getProducts = async (_req: Request, res: Response): Promise<void> => {
   try {
     const products: Product[] = await productService.getProducts();
@@ -44,6 +51,12 @@ const getProducts = async (_req: Request, res: Response): Promise<void> => {
 };
 
 
+/**
+ * Get a product by id. Call the service to get a product by id and validate if the product exists.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns - The response object.
+ */
 const getProductById = async (req: Request, res: Response): Promise<void> => {
   try {
     const id_product = req.params.id_product as string;
@@ -85,6 +98,12 @@ const getProductById = async (req: Request, res: Response): Promise<void> => {
 };
 
 
+/**
+ * Create a new product. Validate if the body is correct and call the service to create a new product.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns - The response object.
+ */
 const postProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const date = getCurrentDate();
@@ -126,6 +145,12 @@ const postProduct = async (req: Request, res: Response): Promise<void> => {
 };
 
 
+/**
+ * Update a product. Validate if the body is correct and call the service to update a product.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns - The response object.
+ */
 const patchProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const date = getCurrentDate();
@@ -178,6 +203,12 @@ const patchProduct = async (req: Request, res: Response): Promise<void> => {
 };
 
 
+/**
+ * Delete a product. Validate if the product exists and call the service to delete a product.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns - The response object.
+ */
 const deleteProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const id_product = req.params.id_product as string;
