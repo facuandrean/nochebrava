@@ -6,8 +6,14 @@ import type { Product, ProductBodyUpdate, ProductWithoutId } from "../types/type
 import { v4 as uuid } from "uuid";
 
 /**
- * Get all products.
- * @returns - An array of products.
+ * Retrieves all products from the database.
+ * 
+ * @description This function fetches all products stored in the database using Drizzle ORM.
+ * Returns an array of all products or an empty array if none exist.
+ * 
+ * @returns {Promise<Product[]>} Promise that resolves to an array of Product objects
+ * 
+ * @throws {AppError} When a database error occurs during the query
  */
 const getProducts = async (): Promise<Product[]> => {
   try {
@@ -18,11 +24,16 @@ const getProducts = async (): Promise<Product[]> => {
   }
 };
 
-
 /**
- * Get a product by id.
- * @param id_product - The id of the product.
- * @returns - The product.
+ * Retrieves a specific product by its unique identifier.
+ * 
+ * @description This function searches for a product in the database using its product_id.
+ * Returns the product if found, or undefined if no product exists with the given ID.
+ * 
+ * @param {string} id_product - The unique identifier of the product to retrieve
+ * @returns {Promise<Product | undefined>} Promise that resolves to a Product object or undefined
+ * 
+ * @throws {AppError} When a database error occurs during the query
  */
 const getProductById = async (id_product: string): Promise<Product | undefined> => {
   try {
@@ -35,9 +46,16 @@ const getProductById = async (id_product: string): Promise<Product | undefined> 
 };
 
 /**
- * Create a new product.
- * @param dataProduct - The data of the product.
- * @returns - The product.
+ * Creates a new product in the database.
+ * 
+ * @description This function creates a new product with the provided data.
+ * Automatically generates a new UUID for the product_id and inserts the record into the database.
+ * Returns the complete product object with the generated ID.
+ * 
+ * @param {ProductWithoutId} dataProduct - The product data without the ID (name, description, price, category_id, timestamps)
+ * @returns {Promise<Product>} Promise that resolves to the created Product object
+ * 
+ * @throws {AppError} When a database error occurs during the insertion
  */
 const postProduct = async (dataProduct: ProductWithoutId): Promise<Product> => {
   try {
@@ -54,10 +72,17 @@ const postProduct = async (dataProduct: ProductWithoutId): Promise<Product> => {
 };
 
 /**
- * Update a product.
- * @param id_product - The id of the product.
- * @param dataProduct - The data of the product.
- * @returns - The product.
+ * Updates an existing product in the database.
+ * 
+ * @description This function updates a product's data in the database using its product_id.
+ * Only updates the fields provided in the dataProduct parameter.
+ * Returns the updated product object with all current data.
+ * 
+ * @param {string} id_product - The unique identifier of the product to update
+ * @param {ProductBodyUpdate} dataProduct - The product data to update (partial product object)
+ * @returns {Promise<Product>} Promise that resolves to the updated Product object
+ * 
+ * @throws {AppError} When a database error occurs during the update
  */
 const patchProduct = async (id_product: string, dataProduct: ProductBodyUpdate): Promise<Product> => {
   try {
@@ -69,9 +94,15 @@ const patchProduct = async (id_product: string, dataProduct: ProductBodyUpdate):
 };
 
 /**
- * Delete a product.
- * @param id_product - The id of the product.
- * @returns - The product.
+ * Deletes a product from the database.
+ * 
+ * @description This function permanently removes a product from the database using its product_id.
+ * No return value is provided as the operation is destructive.
+ * 
+ * @param {string} id_product - The unique identifier of the product to delete
+ * @returns {Promise<void>} Promise that resolves when the deletion is complete
+ * 
+ * @throws {AppError} When a database error occurs during the deletion
  */
 const deleteProduct = async (id_product: string): Promise<void> => {
   try {
