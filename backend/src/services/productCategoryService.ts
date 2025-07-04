@@ -98,8 +98,9 @@ const assignCategoryToProduct = async (productId: string, categoryId: string): P
  * Updates the category assignment of a product in the database.
  * 
  * @description This function updates the relationship between products and categories.
- * It first verifies that both the old and new products/categories exist,
- * checks stock availability for the new product, and then updates the relationship.
+ * It first verifies that the old relationship exists, then checks if the new relationship
+ * already exists, and finally updates the relationship by deleting the old one and
+ * inserting the new one.
  * 
  * @param {string} productIdOld - The ID of the current product
  * @param {string} categoryIdOld - The ID of the current category
@@ -107,8 +108,7 @@ const assignCategoryToProduct = async (productId: string, categoryId: string): P
  * @param {string} categoryIdNew - The ID of the new category
  * @returns {Promise<void>} Promise that resolves when the update is complete
  * 
- * @throws {AppError} When products or categories are not found
- * @throws {AppError} When the new product has no available stock
+ * @throws {AppError} When the old relationship does not exist
  * @throws {AppError} When the new relationship already exists
  * @throws {AppError} When a database error occurs during the update
  */

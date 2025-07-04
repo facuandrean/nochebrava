@@ -9,13 +9,15 @@ import { categoryService } from '../services/categoryService';
  * Retrieves all products by category from the database.
  * 
  * @description This function fetches all products that belong to a specific category
- * through the product-category service. If no products are found for the category,
- * returns a 404 error with an empty array.
+ * through the product-category service. First validates that the category exists,
+ * then retrieves all products associated with that category.
+ * If no products are found for the category, returns a 404 error with an empty array.
  * 
- * @param {Request} req - Express request object that must contain categoryId in parameters
+ * @param {Request} req - Express request object that must contain category_id in parameters
  * @param {Response} res - Express response object
  * @returns {Promise<void>} No return value, sends HTTP response directly
  * 
+ * @throws {AppError} When the category is not found
  * @throws {AppError} When a specific application error occurs
  * @throws {Error} When an internal server error occurs
  */
@@ -74,13 +76,15 @@ const getProductsByCategory = async (req: Request, res: Response): Promise<void>
  * Retrieves all categories by product from the database.
  * 
  * @description This function fetches all categories that are assigned to a specific product
- * through the product-category service. If no categories are found for the product,
- * returns a 404 error with an empty array.
+ * through the product-category service. First validates that the product exists,
+ * then retrieves all categories associated with that product.
+ * If no categories are found for the product, returns a 404 error with an empty array.
  * 
  * @param {Request} req - Express request object that must contain product_id in parameters
  * @param {Response} res - Express response object
  * @returns {Promise<void>} No return value, sends HTTP response directly
  * 
+ * @throws {AppError} When the product is not found
  * @throws {AppError} When a specific application error occurs
  * @throws {Error} When an internal server error occurs
  */
@@ -139,12 +143,15 @@ const getCategoriesByProduct = async (req: Request, res: Response): Promise<void
  * Assigns a category to a product in the database.
  * 
  * @description This function creates a new relationship between a product and a category
- * through the product-category service. This establishes that a product belongs to a specific category.
+ * through the product-category service. First validates that both the product and category exist,
+ * then establishes the relationship. This establishes that a product belongs to a specific category.
  * 
- * @param {Request} req - Express request object that must contain product_id and categoryId in the body
+ * @param {Request} req - Express request object that must contain product_id and category_id in the body
  * @param {Response} res - Express response object
  * @returns {Promise<void>} No return value, sends HTTP response directly
  * 
+ * @throws {AppError} When the product is not found
+ * @throws {AppError} When the category is not found
  * @throws {AppError} When a specific application error occurs (validation, duplicates, etc.)
  * @throws {Error} When an internal server error occurs
  */
@@ -205,13 +212,13 @@ const assignCategoryToProduct = async (req: Request, res: Response): Promise<voi
  * 
  * @description This function updates the relationship between products and categories.
  * It takes the old product-category relationship from parameters and the new relationship from the body.
- * First verifies that both the old and new products/categories exist, then updates the relationship.
+ * First verifies that all products and categories exist (old and new), then updates the relationship.
  * 
- * @param {Request} req - Express request object that must contain product_id_old and category_id_old in parameters, and productIdNew and categoryIdNew in the body
+ * @param {Request} req - Express request object that must contain product_id_old and category_id_old in parameters, and product_id and category_id in the body
  * @param {Response} res - Express response object
  * @returns {Promise<void>} No return value, sends HTTP response directly
  * 
- * @throws {AppError} When products or categories are not found
+ * @throws {AppError} When any of the products or categories are not found
  * @throws {AppError} When the new relationship already exists
  * @throws {AppError} When a database error occurs during the update
  * @throws {Error} When an internal server error occurs
@@ -294,14 +301,15 @@ const updateProductCategory = async (req: Request, res: Response): Promise<void>
  * Unassigns a category from a product in the database.
  * 
  * @description This function removes the relationship between a product and a category
- * through the product-category service. This removes the category assignment from the product.
- * Validates that both product_id and categoryId are valid UUIDs before proceeding.
+ * through the product-category service. First validates that both the product and category exist,
+ * then removes the category assignment from the product.
  * 
- * @param {Request} req - Express request object that must contain product_id and categoryId in parameters
+ * @param {Request} req - Express request object that must contain product_id and category_id in parameters
  * @param {Response} res - Express response object
  * @returns {Promise<void>} No return value, sends HTTP response directly
  * 
- * @throws {AppError} When product_id or categoryId are not valid UUIDs
+ * @throws {AppError} When the product is not found
+ * @throws {AppError} When the category is not found
  * @throws {AppError} When a specific application error occurs
  * @throws {Error} When an internal server error occurs
  */
