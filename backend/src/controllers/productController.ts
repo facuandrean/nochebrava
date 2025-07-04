@@ -4,12 +4,19 @@ import type { Product, ProductBodyPost, ProductBodyUpdate, ProductWithoutId } fr
 import { AppError } from "../errors";
 import { getCurrentDate } from "../utils/date";
 
-
 /**
- * Get all products. Call the service to get all products.
- * @param _req - The request object.
- * @param res - The response object.
- * @returns - The response object.
+ * Retrieves all products available in the system.
+ * 
+ * @description This function fetches all products from the database through the product service.
+ * If no products are found, returns a 404 error with an empty array.
+ * On success, returns an array with all found products.
+ * 
+ * @param {Request} _req - Express request object (unused)
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>} No return value, sends HTTP response directly
+ * 
+ * @throws {AppError} When a specific application error occurs
+ * @throws {Error} When an internal server error occurs
  */
 const getProducts = async (_req: Request, res: Response): Promise<void> => {
   try {
@@ -50,12 +57,19 @@ const getProducts = async (_req: Request, res: Response): Promise<void> => {
   }
 };
 
-
 /**
- * Get a product by id. Call the service to get a product by id and validate if the product exists.
- * @param req - The request object.
- * @param res - The response object.
- * @returns - The response object.
+ * Retrieves a specific product by its ID.
+ * 
+ * @description This function searches for a product in the database using its unique ID.
+ * If the product doesn't exist, returns a 404 error.
+ * On success, returns the complete data of the found product.
+ * 
+ * @param {Request} req - Express request object that must contain id_product in parameters
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>} No return value, sends HTTP response directly
+ * 
+ * @throws {AppError} When a specific application error occurs
+ * @throws {Error} When an internal server error occurs
  */
 const getProductById = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -97,12 +111,19 @@ const getProductById = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-
 /**
- * Create a new product. Validate if the body is correct and call the service to create a new product.
- * @param req - The request object.
- * @param res - The response object.
- * @returns - The response object.
+ * Creates a new product in the system.
+ * 
+ * @description This function creates a new product with the data provided in the request body.
+ * Automatically assigns creation and update dates.
+ * Returns the created product with all its data, including the generated ID.
+ * 
+ * @param {Request} req - Express request object that must contain product data in the body
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>} No return value, sends HTTP response directly
+ * 
+ * @throws {AppError} When a specific application error occurs (validation, duplicates, etc.)
+ * @throws {Error} When an internal server error occurs
  */
 const postProduct = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -144,12 +165,19 @@ const postProduct = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-
 /**
- * Update a product. Validate if the body is correct and call the service to update a product.
- * @param req - The request object.
- * @param res - The response object.
- * @returns - The response object.
+ * Updates an existing product by its ID.
+ * 
+ * @description This function updates the data of an existing product.
+ * First verifies that the product exists, then combines existing data with new provided data.
+ * Automatically updates the modification date.
+ * 
+ * @param {Request} req - Express request object that must contain id_product in parameters and data to update in the body
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>} No return value, sends HTTP response directly
+ * 
+ * @throws {AppError} When a specific application error occurs
+ * @throws {Error} When an internal server error occurs
  */
 const patchProduct = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -202,12 +230,19 @@ const patchProduct = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-
 /**
- * Delete a product. Validate if the product exists and call the service to delete a product.
- * @param req - The request object.
- * @param res - The response object.
- * @returns - The response object.
+ * Deletes a product from the system by its ID.
+ * 
+ * @description This function permanently removes a product from the database.
+ * First verifies that the product exists before proceeding with deletion.
+ * Once deleted, returns a confirmation of the operation.
+ * 
+ * @param {Request} req - Express request object that must contain id_product in parameters
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>} No return value, sends HTTP response directly
+ * 
+ * @throws {AppError} When a specific application error occurs
+ * @throws {Error} When an internal server error occurs
  */
 const deleteProduct = async (req: Request, res: Response): Promise<void> => {
   try {
