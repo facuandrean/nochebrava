@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../database/database";
 import { categories } from "../database/db/categoryScheme";
 import { AppError } from "../errors";
-import type { Category, CategoryWithoutId } from "../types/types";
+import type { Category, CategoryWithoutId, UUIDInput } from "../types/types";
 import { v4 as uuid } from "uuid";
 
 /**
@@ -35,7 +35,7 @@ const getCategories = async (): Promise<Category[]> => {
  * 
  * @throws {AppError} When a database error occurs during the query
  */
-const getCategoryById = async (category_id: string): Promise<Category | undefined> => {
+const getCategoryById = async (category_id: string | UUIDInput): Promise<Category | undefined> => {
   try {
     const category: Category | undefined = await db.select().from(categories).where(eq(categories.category_id, category_id)).get();
     return category;
