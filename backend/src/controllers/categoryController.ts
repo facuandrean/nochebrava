@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { AppError } from "../errors";
-import type { Category, CategoryBodyPost, CategoryWithoutId } from "../types/types";
+import type { Category, CategoryBodyPost, CategoryBodyUpdate, CategoryWithoutId } from "../types/types";
 import { categoryService } from "../services/categoryService";
 import { getCurrentDate } from "../utils/date";
 
@@ -123,9 +123,99 @@ const postCategory = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-const patchCategory = () => { };
+const patchCategory = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const date = getCurrentDate();
+    const category_id = req.params.category_id as string;
+    const dataCategory = req.body as CategoryBodyUpdate;
 
-const deleteCategory = () => { };
+    const oldDataCategory: Category | undefined = await categoryService.getCategoryById(category_id);
+
+    if (!oldDataCategory) {
+      res.status(404).json({
+        status: "Operación fallida",
+        message: "No se encontró la categoría.",
+        data: []
+      });
+      return;
+    };
+
+    const newCategoryData: Category = {
+      ...oldDataCategory,
+      ...dataCategory,
+      updated_at: date
+    }
+
+    const categoryUpdated: Category = await categoryService.patchCategory(newCategoryData);
+
+    res.status(201).json({
+      status: "Operación exitosa.",
+      message: "Categoría actualizada correctamente.",
+      data: categoryUpdated
+    });
+    return;
+
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.status).json({
+        status: "Operación fallida",
+        message: error.message,
+        data: error.data
+      });
+      return;
+    }
+
+    res.status(500).json({
+      status: "Operación fallida",
+      message: "Error interno del servidor.",
+      data: []
+    });
+    return;
+  }
+};
+
+const deleteCategory = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const category_id = req.params.category_id as string;
+
+    const category: Category | undefined = await categoryService.getCategoryById(category_id);
+
+    if (!category) {
+      res.status(404).json({
+        status: "Operación fallida",
+        message: "No se encontró la categoría.",
+        data: []
+      });
+      return;
+    };
+
+    await categoryService.deleteCategory(category_id);
+
+    res.status(201).json({
+      status: "Operación exitosa.",
+      message: "Categoría eliminada correctamente.",
+      data: []
+    });
+    return;
+
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.status).json({
+        status: "Operación fallida",
+        message: error.message,
+        data: error.data
+      });
+      return;
+    }
+
+    res.status(500).json({
+      status: "Operación fallida",
+      message: "Error interno del servidor.",
+      data: []
+    });
+    return;
+  }
+};
 
 export const categoryController = {
   getCategories,

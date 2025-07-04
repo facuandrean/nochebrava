@@ -37,9 +37,23 @@ const postCategory = async (dataCategory: CategoryWithoutId): Promise<Category> 
 };
 
 
-const patchCategory = () => { };
+const patchCategory = async (dataCategory: Category) => {
+  try {
+    const category: Category = await db.update(categories).set(dataCategory).where(eq(categories.category_id, dataCategory.category_id)).returning().get();
+    return category;
+  } catch (error) {
+    throw new AppError("Ocurrió un error al actualizar la categoría.", 500, []);
+  }
+};
 
-const deleteCategory = () => { };
+const deleteCategory = async (category_id: string): Promise<void> => {
+  try {
+    await db.delete(categories).where(eq(categories.category_id, category_id));
+    return;
+  } catch (error) {
+    throw new AppError("Ocurrió un error al eliminar la categoría.", 500, []);
+  }
+};
 
 export const categoryService = {
   getCategories,
