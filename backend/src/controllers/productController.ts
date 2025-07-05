@@ -101,6 +101,7 @@ const getProductById = async (req: Request, res: Response): Promise<void> => {
         message: error.message,
         data: error.data
       });
+      return;
     }
 
     res.status(500).json({
@@ -108,6 +109,7 @@ const getProductById = async (req: Request, res: Response): Promise<void> => {
       message: 'Error interno del servidor.',
       data: []
     });
+    return;
   }
 };
 
