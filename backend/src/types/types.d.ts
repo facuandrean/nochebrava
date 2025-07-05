@@ -9,6 +9,8 @@ import type { productCategories } from '../database/db/productCategoryScheme';
 import type { productCategoryPostSchema, productCategoryUpdateSchema } from '../schemas/productCategorySchema';
 import type { packs } from '../database/db/packScheme';
 import type { packPostSchema, packUpdateSchema } from '../schemas/packSchema';
+import type { paymentMethods } from '../database/db/paymentMethodScheme';
+import type { paymentMethodPostSchema } from '../schemas/paymentMethodSchema';
 
 export type UUID = `${string}-${string}-${string}-${string}-${string}`;
 export type UUIDInput = Input<typeof uuidSchema>;
@@ -31,3 +33,6 @@ export type Pack = InferModel<typeof packs>;
 export type PackWithoutId = Omit<Pack, "pack_id">;
 export type PackBodyPost = Input<typeof packPostSchema>;
 export type PackBodyUpdate = Input<typeof packUpdateSchema>;
+
+export type PaymentMethod = InferModel<typeof paymentMethods>;
+export type PaymentMethodBodyPost = Input<typeof paymentMethodPostSchema>;
