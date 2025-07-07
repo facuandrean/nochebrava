@@ -3,6 +3,7 @@ import { db } from "../database/database";
 import { packs } from "../database/db/packScheme";
 import { AppError } from "../errors";
 import type { Pack, PackBodyPost, PackBodyUpdate } from "../types/types";
+import { getCurrentDate } from "../utils/date";
 import { v4 as uuid } from "uuid";
 
 const getPacks = async (): Promise<Pack[]> => {
@@ -25,9 +26,12 @@ const getPackById = async (pack_id: string): Promise<Pack | undefined> => {
 
 const postPack = async (dataPack: PackBodyPost): Promise<Pack> => {
   try {
+    const date = getCurrentDate();
     const newPack = {
       pack_id: uuid(),
-      ...dataPack
+      ...dataPack,
+      created_at: date,
+      updated_at: date
     };
 
     const pack: Pack = await db.insert(packs).values(newPack).returning().get();
@@ -39,7 +43,12 @@ const postPack = async (dataPack: PackBodyPost): Promise<Pack> => {
 
 const updatePack = async (pack_id: string, dataPack: PackBodyUpdate): Promise<Pack> => {
   try {
-    const pack = await db.update(packs).set(dataPack).where(eq(packs.pack_id, pack_id)).returning().get();
+    const date = getCurrentDate();
+    const pack = await db.update(packs)
+      .set({ ...dataPack, updated_at: date })
+      .where(eq(packs.pack_id, pack_id))
+      .returning()
+      .get();
     return pack;
   } catch (error) {
     throw new AppError("Error al actualizar el pack.", 400, []);

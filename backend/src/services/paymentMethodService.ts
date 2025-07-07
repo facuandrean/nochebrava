@@ -3,6 +3,7 @@ import { db } from "../database/database";
 import { paymentMethods } from "../database/db/paymentMethodScheme";
 import { AppError } from "../errors";
 import type { PaymentMethod, PaymentMethodBodyPost } from "../types/types";
+import { getCurrentDate } from "../utils/date";
 import { v4 as uuid } from "uuid";
 
 /**
@@ -58,9 +59,12 @@ const getPaymentMethodById = async (payment_method_id: string): Promise<PaymentM
  */
 const postPaymentMethod = async (dataPaymentMethod: PaymentMethodBodyPost): Promise<PaymentMethod> => {
   try {
+    const date = getCurrentDate();
     const newPaymentMethod = {
       payment_method_id: uuid(),
-      ...dataPaymentMethod
+      ...dataPaymentMethod,
+      created_at: date,
+      updated_at: date
     };
 
     const paymentMethod: PaymentMethod = await db.insert(paymentMethods).values(newPaymentMethod).returning().get();

@@ -1,8 +1,7 @@
 import type { Request, Response } from "express";
 import { productService } from "../services/productService";
-import type { Product, ProductBodyPost, ProductBodyUpdate, ProductWithoutId } from "../types/types";
+import type { Product, ProductBodyPost, ProductBodyUpdate } from "../types/types";
 import { AppError } from "../errors";
-import { getCurrentDate } from "../utils/date";
 
 /**
  * Retrieves all products available in the system.
@@ -129,16 +128,9 @@ const getProductById = async (req: Request, res: Response): Promise<void> => {
  */
 const postProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const date = getCurrentDate();
     const productData = req.body as ProductBodyPost;
 
-    const newProduct: ProductWithoutId = {
-      ...productData,
-      created_at: date,
-      updated_at: date
-    }
-
-    const product: Product = await productService.postProduct(newProduct);
+    const product: Product = await productService.postProduct(productData);
 
     res.status(201).json({
       status: 'Operación exitosa',
@@ -183,7 +175,6 @@ const postProduct = async (req: Request, res: Response): Promise<void> => {
  */
 const patchProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const date = getCurrentDate();
     const id_product = req.params.id_product as string;
     const productData = req.body as ProductBodyUpdate;
 
@@ -198,13 +189,7 @@ const patchProduct = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const newProductData = {
-      ...oldProductData,
-      ...productData,
-      updated_at: date
-    }
-
-    const updatedProduct: Product = await productService.patchProduct(id_product, newProductData);
+    const updatedProduct: Product = await productService.patchProduct(id_product, productData);
 
     res.status(200).json({
       status: 'Operación exitosa',

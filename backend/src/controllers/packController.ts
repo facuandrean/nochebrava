@@ -1,8 +1,7 @@
 import type { Request, Response } from "express";
 import { AppError } from "../errors";
 import { packService } from "../services/packService";
-import type { Pack, PackBodyPost, PackBodyUpdate, PackWithoutId } from "../types/types";
-import { getCurrentDate } from "../utils/date";
+import type { Pack, PackBodyPost, PackBodyUpdate } from "../types/types";
 
 const getPacks = async (_req: Request, res: Response): Promise<void> => {
   try {
@@ -84,16 +83,9 @@ const getPackById = async (req: Request, res: Response): Promise<void> => {
 
 const postPack = async (req: Request, res: Response): Promise<void> => {
   try {
-    const date = getCurrentDate();
     const dataPack = req.body as PackBodyPost;
 
-    const pack: PackWithoutId = {
-      ...dataPack,
-      created_at: date,
-      updated_at: date
-    }
-
-    const newPack: Pack = await packService.postPack(pack);
+    const newPack: Pack = await packService.postPack(dataPack);
 
     res.status(201).json({
       status: "Operación exitosa.",
@@ -124,7 +116,6 @@ const updatePack = async (req: Request, res: Response): Promise<void> => {
   try {
     const pack_id = req.params.pack_id as string;
     const dataPack = req.body as PackBodyUpdate;
-    const date = getCurrentDate();
 
     const existsPack = await packService.getPackById(pack_id);
     if (!existsPack) {
@@ -136,13 +127,7 @@ const updatePack = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const pack: Pack = {
-      ...existsPack,
-      ...dataPack,
-      updated_at: date
-    }
-
-    const updatedPack: Pack = await packService.updatePack(pack_id, pack);
+    const updatedPack: Pack = await packService.updatePack(pack_id, dataPack);
 
     res.status(200).json({
       status: "Operación exitosa.",

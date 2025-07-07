@@ -127,11 +127,7 @@ const postPaymentMethod = async (req: Request, res: Response): Promise<void> => 
   try {
     const dataPaymentMethod = req.body as PaymentMethodBodyPost;
 
-    const newPaymentMethod = {
-      ...dataPaymentMethod
-    };
-
-    const paymentMethod: PaymentMethod = await paymentMethodService.postPaymentMethod(newPaymentMethod);
+    const paymentMethod: PaymentMethod = await paymentMethodService.postPaymentMethod(dataPaymentMethod);
 
     res.status(201).json({
       status: "Operación exitosa.",

@@ -2,7 +2,8 @@ import { eq } from "drizzle-orm";
 import { db } from "../database/database";
 import { products } from "../database/db/productScheme";
 import { AppError } from "../errors";
-import type { Product, ProductBodyUpdate, ProductWithoutId } from "../types/types";
+import type { Product, ProductBodyPost, ProductBodyUpdate } from "../types/types";
+import { getCurrentDate } from "../utils/date";
 import { v4 as uuid } from "uuid";
 
 /**
@@ -52,16 +53,19 @@ const getProductById = async (id_product: string): Promise<Product | undefined> 
  * Automatically generates a new UUID for the product_id and inserts the record into the database.
  * Returns the complete product object with the generated ID.
  * 
- * @param {ProductWithoutId} dataProduct - The product data without the ID (name, description, price, category_id, timestamps)
+ * @param {ProductBodyPost} dataProduct - The product data without the ID (name, description, price, category_id, timestamps)
  * @returns {Promise<Product>} Promise that resolves to the created Product object
  * 
  * @throws {AppError} When a database error occurs during the insertion
  */
-const postProduct = async (dataProduct: ProductWithoutId): Promise<Product> => {
+const postProduct = async (dataProduct: ProductBodyPost): Promise<Product> => {
   try {
+    const date = getCurrentDate();
     const newProduct = {
       product_id: uuid(),
-      ...dataProduct
+      ...dataProduct,
+      created_at: date,
+      updated_at: date
     };
 
     const product: Product = await db.insert(products).values(newProduct).returning().get();
@@ -86,7 +90,12 @@ const postProduct = async (dataProduct: ProductWithoutId): Promise<Product> => {
  */
 const patchProduct = async (id_product: string, dataProduct: ProductBodyUpdate): Promise<Product> => {
   try {
-    const updatedProduct = db.update(products).set(dataProduct).where(eq(products.product_id, id_product)).returning().get();
+    const date = getCurrentDate();
+    const updatedProduct = await db.update(products)
+      .set({ ...dataProduct, updated_at: date })
+      .where(eq(products.product_id, id_product))
+      .returning()
+      .get();
     return updatedProduct;
   } catch (error) {
     throw new AppError('Ocurrió un error al actualizar el producto.', 400, []);

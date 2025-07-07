@@ -1,8 +1,7 @@
 import type { Request, Response } from "express";
 import { AppError } from "../errors";
-import type { Category, CategoryBodyPost, CategoryBodyUpdate, CategoryWithoutId } from "../types/types";
+import type { Category, CategoryBodyPost, CategoryBodyUpdate } from "../types/types";
 import { categoryService } from "../services/categoryService";
-import { getCurrentDate } from "../utils/date";
 
 /**
  * Retrieves all categories available in the system.
@@ -128,16 +127,9 @@ const getCategoryById = async (req: Request, res: Response): Promise<void> => {
  */
 const postCategory = async (req: Request, res: Response): Promise<void> => {
   try {
-    const date = getCurrentDate();
     const dataCategory: CategoryBodyPost = req.body;
 
-    const newCategory: CategoryWithoutId = {
-      ...dataCategory,
-      created_at: date,
-      updated_at: date
-    }
-
-    const category: Category = await categoryService.postCategory(newCategory);
+    const category: Category = await categoryService.postCategory(dataCategory);
 
     res.status(201).json({
       status: "Operación exitosa.",
@@ -181,7 +173,6 @@ const postCategory = async (req: Request, res: Response): Promise<void> => {
  */
 const patchCategory = async (req: Request, res: Response): Promise<void> => {
   try {
-    const date = getCurrentDate();
     const category_id = req.params.category_id as string;
     const dataCategory = req.body as CategoryBodyUpdate;
 
@@ -196,13 +187,7 @@ const patchCategory = async (req: Request, res: Response): Promise<void> => {
       return;
     };
 
-    const newCategoryData: Category = {
-      ...oldDataCategory,
-      ...dataCategory,
-      updated_at: date
-    }
-
-    const categoryUpdated: Category = await categoryService.patchCategory(newCategoryData);
+    const categoryUpdated: Category = await categoryService.patchCategory(category_id, dataCategory);
 
     res.status(201).json({
       status: "Operación exitosa.",
