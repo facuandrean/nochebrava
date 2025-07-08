@@ -13,6 +13,8 @@ import type { paymentMethods } from '../database/db/paymentMethodScheme';
 import type { paymentMethodPostSchema } from '../schemas/paymentMethodSchema';
 import type { packItems } from '../database/db/packItemScheme';
 import type { packItemPostSchema, packItemUpdateSchema } from '../schemas/packItemSchema';
+import type { itemTypes } from '../database/db/itemTypeScheme';
+import type { itemTypeSchema } from '../schemas/itemTypeSchema';
 
 export type UUID = `${string}-${string}-${string}-${string}-${string}`;
 export type UUIDInput = Input<typeof uuidSchema>;
@@ -43,3 +45,6 @@ export type PackItemBodyUpdate = Input<typeof packItemUpdateSchema>;
 
 export type PaymentMethod = InferModel<typeof paymentMethods>;
 export type PaymentMethodBodyPost = Input<typeof paymentMethodPostSchema>;
+
+export type ItemType = InferModel<typeof itemTypes>;
+export type ItemTypeBody = Input<typeof itemTypeSchema>;
