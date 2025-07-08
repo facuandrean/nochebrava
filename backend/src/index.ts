@@ -8,6 +8,7 @@ import packRouter from "./v1/routes/packRoutes";
 import packItemRouter from "./v1/routes/packItemRoutes";
 import paymentMethodRouter from "./v1/routes/paymentMethodRoutes";
 import itemTypeRouter from "./v1/routes/itemTypeRoutes";
+import expenseRouter from "./v1/routes/expenseRoutes";
 
 const app = express();
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use("/api/v1/packs", packRouter);
 app.use("/api/v1/pack-items", packItemRouter);
 app.use("/api/v1/payment-methods", paymentMethodRouter);
 app.use("/api/v1/item-types", itemTypeRouter);
+app.use("/api/v1/expenses", expenseRouter);
 
 app.listen(config.port, () => {
   console.log(`Server is running on port 3000. http://localhost:${config.port}`);

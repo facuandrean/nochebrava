@@ -15,6 +15,8 @@ import type { packItems } from '../database/db/packItemScheme';
 import type { packItemPostSchema, packItemUpdateSchema } from '../schemas/packItemSchema';
 import type { itemTypes } from '../database/db/itemTypeScheme';
 import type { itemTypeSchema } from '../schemas/itemTypeSchema';
+import type { expenses } from '../database/db/expenseScheme';
+import type { expenseBodyScheme } from '../schemas/expenseSchema';
 
 export type UUID = `${string}-${string}-${string}-${string}-${string}`;
 export type UUIDInput = Input<typeof uuidSchema>;
@@ -48,3 +50,6 @@ export type PaymentMethodBodyPost = Input<typeof paymentMethodPostSchema>;
 
 export type ItemType = InferModel<typeof itemTypes>;
 export type ItemTypeBody = Input<typeof itemTypeSchema>;
+
+export type Expense = InferModel<typeof expenses>;
+export type ExpenseBody = Input<typeof expenseBodyScheme>;
