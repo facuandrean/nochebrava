@@ -17,6 +17,8 @@ import type { itemTypes } from '../database/db/itemTypeScheme';
 import type { itemTypeSchema } from '../schemas/itemTypeSchema';
 import type { expenses } from '../database/db/expenseScheme';
 import type { expenseBodyScheme } from '../schemas/expenseSchema';
+import type { expenseItems } from '../database/db/expenseItemScheme';
+import type { expenseItemsScheme } from '../schemas/expenseItemSchema';
 
 export type UUID = `${string}-${string}-${string}-${string}-${string}`;
 export type UUIDInput = Input<typeof uuidSchema>;
@@ -53,3 +55,6 @@ export type ItemTypeBody = Input<typeof itemTypeSchema>;
 
 export type Expense = InferModel<typeof expenses>;
 export type ExpenseBody = Input<typeof expenseBodyScheme>;
+
+export type ExpenseItem = InferModel<typeof expenseItems>;
+export type ExpenseItemBody = Input<typeof expenseItemsScheme>;

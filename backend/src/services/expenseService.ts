@@ -26,10 +26,10 @@ const getExpenseById = async (expense_id: string): Promise<Expense | undefined> 
 
 const postExpense = async (expenseBody: ExpenseBody): Promise<Expense> => {
     try {
-
+        const date = getCurrentDate();
         const newExpense = {
             expense_id: uuid(),
-            created_at: getCurrentDate(),
+            created_at: date,
             ...expenseBody
         };
 
