@@ -4,6 +4,17 @@ import { packItemService } from "../services/packItemService";
 import type { Pack, PackItem, PackItemBodyPost, PackItemBodyUpdate } from "../types/types";
 import { packService } from "../services/packService";
 
+/**
+ * Obtiene todos los pack items del sistema.
+ * 
+ * @description Endpoint que recupera todos los pack items disponibles en el sistema.
+ * Retorna un array con todos los pack items o un array vacío si no hay items.
+ * Los pack items representan los productos individuales que componen cada pack.
+ * 
+ * @param {Request} _req - Objeto de solicitud Express (no utilizado)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {Promise<void>} No retorna valor, envía respuesta HTTP
+ */
 const getPackItems = async (_req: Request, res: Response): Promise<void> => {
   try {
     const packItems = await packItemService.getPackItems();
@@ -42,6 +53,16 @@ const getPackItems = async (_req: Request, res: Response): Promise<void> => {
   }
 };
 
+/**
+ * Obtiene un pack item específico por su ID.
+ * 
+ * @description Endpoint que busca un pack item específico usando su identificador único.
+ * Retorna el pack item completo si existe, o un error 404 si no se encuentra.
+ * 
+ * @param {Request} req - Objeto de solicitud Express con pack_item_id en params
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {Promise<void>} No retorna valor, envía respuesta HTTP
+ */
 const getPackItemById = async (req: Request, res: Response): Promise<void> => {
   try {
     const pack_item_id = req.params.pack_item_id as string;
@@ -82,6 +103,17 @@ const getPackItemById = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+/**
+ * Obtiene todos los items de un pack específico.
+ * 
+ * @description Endpoint que busca todos los pack items asociados a un pack específico.
+ * Valida que el pack existe antes de buscar sus items.
+ * Retorna un array con todos los items del pack o un error 404 si no hay items.
+ * 
+ * @param {Request} req - Objeto de solicitud Express con pack_id en params
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {Promise<void>} No retorna valor, envía respuesta HTTP
+ */
 const getPackItemsByPackId = async (req: Request, res: Response): Promise<void> => {
   try {
     const pack_id = req.params.pack_id as string;
@@ -133,6 +165,17 @@ const getPackItemsByPackId = async (req: Request, res: Response): Promise<void> 
   }
 };
 
+/**
+ * Crea un nuevo pack item o actualiza la cantidad si ya existe.
+ * 
+ * @description Endpoint que crea un nuevo pack item o actualiza la cantidad si el producto ya existe en el pack.
+ * Si viene desde una ruta compuesta, usa el pack_id de la URL.
+ * Verifica si ya existe un item con el mismo producto en el pack antes de crear o actualizar.
+ * 
+ * @param {Request} req - Objeto de solicitud Express con datos del pack item en body y opcionalmente pack_id en params
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {Promise<void>} No retorna valor, envía respuesta HTTP
+ */
 const postPackItem = async (req: Request, res: Response): Promise<void> => {
   try {
     const dataPackItem = req.body as PackItemBodyPost;
@@ -144,7 +187,7 @@ const postPackItem = async (req: Request, res: Response): Promise<void> => {
 
     // Verificar si ya existe un item con el mismo producto en este pack
     const existingItem = await packItemService.getPackItemByPackAndProduct(
-      dataPackItem.pack_id, 
+      dataPackItem.pack_id,
       dataPackItem.product_id
     );
 
@@ -153,7 +196,7 @@ const postPackItem = async (req: Request, res: Response): Promise<void> => {
     if (existingItem) {
       // Actualizar cantidad del item existente
       const newQuantity = existingItem.quantity + dataPackItem.quantity;
-      
+
       result = await packItemService.updatePackItem(existingItem.pack_item_id, {
         quantity: newQuantity
       });
@@ -193,6 +236,16 @@ const postPackItem = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+/**
+ * Actualiza un pack item existente en el sistema.
+ * 
+ * @description Endpoint que modifica los datos de un pack item existente usando su ID.
+ * Valida que el pack item existe antes de actualizarlo y retorna el pack item actualizado.
+ * 
+ * @param {Request} req - Objeto de solicitud Express con pack_item_id en params y datos en body
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {Promise<void>} No retorna valor, envía respuesta HTTP
+ */
 const putPackItem = async (req: Request, res: Response): Promise<void> => {
   try {
     const pack_item_id = req.params.pack_item_id as string;
@@ -236,6 +289,16 @@ const putPackItem = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+/**
+ * Elimina un pack item del sistema.
+ * 
+ * @description Endpoint que elimina permanentemente un pack item usando su ID.
+ * Valida que el pack item existe antes de eliminarlo. Esta operación es irreversible.
+ * 
+ * @param {Request} req - Objeto de solicitud Express con pack_item_id en params
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {Promise<void>} No retorna valor, envía respuesta HTTP
+ */
 const deletePackItem = async (req: Request, res: Response): Promise<void> => {
   try {
     const pack_item_id = req.params.pack_item_id as string;
@@ -268,7 +331,6 @@ const deletePackItem = async (req: Request, res: Response): Promise<void> => {
       });
       return;
     }
-
     res.status(500).json({
       status: "Operación fallida.",
       message: "Error interno del servidor.",
