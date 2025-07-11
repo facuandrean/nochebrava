@@ -2,9 +2,11 @@ import { eq } from "drizzle-orm";
 import { db } from "../database/database";
 import { expenses } from "../database/db/expenseScheme";
 import { AppError } from "../errors";
-import type { Expense, ExpenseBody } from "../types/types";
+import type { Expense, ExpenseBody, ExpenseItem } from "../types/types";
 import { v4 as uuid } from "uuid";
 import { getCurrentDate } from "../utils/date";
+import { expenseItems } from "../database/db/expenseItemScheme";
+import { paymentMethodService } from "./paymentMethodService";
 
 const getExpenses = async (): Promise<Expense[]> => {
     try {
@@ -24,9 +26,24 @@ const getExpenseById = async (expense_id: string): Promise<Expense | undefined> 
     }
 }
 
+const getExpenseItems = async (expense_id: string): Promise<ExpenseItem[]> => {
+    try {
+        const items: ExpenseItem[] = await db.select().from(expenseItems).where(eq(expenseItems.expense_id, expense_id)).all();
+        return items;
+    } catch (error) {
+        throw new AppError("Error al obtener los items del gasto.", 400, []);
+    }
+}
+
 const postExpense = async (expenseBody: ExpenseBody): Promise<Expense> => {
     try {
+        const paymentMethod = await paymentMethodService.getPaymentMethodById(expenseBody.payment_method_id);
+        if (!paymentMethod) {
+            throw new AppError("Método de pago no encontrado", 404, []);
+        }
+
         const date = getCurrentDate();
+
         const newExpense = {
             expense_id: uuid(),
             created_at: date,
@@ -49,9 +66,10 @@ const deleteExpense = async (expense_id: string): Promise<void> => {
     }
 }
 
-export const expenseService = { 
-    getExpenses, 
+export const expenseService = {
+    getExpenses,
     getExpenseById,
+    getExpenseItems,
     postExpense,
     deleteExpense
 };

@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { expenseService } from "../services/expenseService";
-import type { Expense, ExpenseBody } from "../types/types";
+import type { Expense, ExpenseBody, ExpenseItem } from "../types/types";
 import { AppError } from "../errors";
 
 const getExpenses = async (_req: Request, res: Response): Promise<void> => {
@@ -18,7 +18,7 @@ const getExpenses = async (_req: Request, res: Response): Promise<void> => {
             status: "Operación exitosa",
             message: "Gastos obtenidos correctamente.",
             data: expenses
-        }); 
+        });
         return;
     } catch (error) {
         if (error instanceof AppError) {
@@ -54,7 +54,7 @@ const getExpenseById = async (req: Request, res: Response): Promise<void> => {
             status: "Operación exitosa",
             message: "Gasto obtenido correctamente.",
             data: expense
-        }); 
+        });
         return;
     } catch (error) {
         if (error instanceof AppError) {
@@ -74,10 +74,64 @@ const getExpenseById = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
+const getExpenseItems = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const expense_id = req.params.expense_id as string;
+
+        const existsExpense = await expenseService.getExpenseById(expense_id);
+        if (!existsExpense) {
+            res.status(404).json({
+                status: "Operación fallida",
+                message: "Gasto no encontrado.",
+                data: []
+            });
+            return;
+        }
+
+        const items: ExpenseItem[] = await expenseService.getExpenseItems(expense_id);
+        if (items.length === 0) {
+            res.status(404).json({
+                status: "Operación fallida",
+                message: "No se encontraron items en el gasto.",
+                data: []
+            });
+            return;
+        }
+
+        res.status(200).json({
+            status: "Operación exitosa",
+            message: "Items del gasto obtenidos correctamente.",
+            data: {
+                expense: existsExpense,
+                items
+            }
+        });
+        return;
+    } catch (error) {
+        if (error instanceof AppError) {
+            res.status(error.status).json({
+                status: "Operación fallida",
+                message: error.message,
+                data: error.data
+            });
+            return;
+        }
+        res.status(500).json({
+            status: "Error interno del servidor",
+            message: "Error al obtener los items del gasto.",
+            data: []
+        });
+        return;
+    }
+
+}
+
 const postExpense = async (req: Request, res: Response): Promise<void> => {
     try {
         const expenseBody = req.body as ExpenseBody;
+
         const expense: Expense = await expenseService.postExpense(expenseBody);
+
         res.status(201).json({
             status: "Operación exitosa",
             message: "Gasto creado correctamente.",
@@ -141,9 +195,10 @@ const deleteExpense = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-export const expenseController = { 
-    getExpenses, 
+export const expenseController = {
+    getExpenses,
     getExpenseById,
+    getExpenseItems,
     postExpense,
     deleteExpense
 };

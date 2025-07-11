@@ -10,4 +10,6 @@ expenseRoutes.get("/:expense_id", expenseController.getExpenseById);
 expenseRoutes.post("/", validateBody(false, expenseBodyScheme, expenseBodyScheme), expenseController.postExpense);
 expenseRoutes.delete("/:expense_id", expenseController.deleteExpense);
 
+expenseRoutes.get("/:expense_id/items", expenseController.getExpenseItems);
+
 export default expenseRoutes;
