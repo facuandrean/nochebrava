@@ -7,6 +7,21 @@ import { v4 as uuid } from "uuid";
 import { expenseService } from "./expenseService";
 import { productService } from "./productService";
 
+/**
+ * Creates a new expense item in the database.
+ * 
+ * @description This function creates a new expense item with the provided data.
+ * First validates that both the expense and product exist, then calculates the subtotal
+ * automatically and creates the expense item. Finally updates the product stock
+ * by adding the purchased quantity to the current stock.
+ * 
+ * @param {ExpenseItemBody} expenseItemBody - The expense item data (expense_id, product_id, quantity, unit_price)
+ * @returns {Promise<ExpenseItem>} Promise that resolves to the created ExpenseItem object
+ * 
+ * @throws {AppError} When the expense is not found
+ * @throws {AppError} When the product is not found
+ * @throws {AppError} When a database error occurs during the insertion
+ */
 const postExpenseItem = async (expenseItemBody: ExpenseItemBody): Promise<ExpenseItem> => {
     try {
         const expense = await expenseService.getExpenseById(expenseItemBody.expense_id);
@@ -45,6 +60,21 @@ const postExpenseItem = async (expenseItemBody: ExpenseItemBody): Promise<Expens
     }
 };
 
+/**
+ * Deletes an expense item from the database.
+ * 
+ * @description This function permanently removes an expense item from the database.
+ * First retrieves the item to get the product and quantity information,
+ * then deletes the item and updates the product stock by subtracting
+ * the quantity that was previously added.
+ * 
+ * @param {string} expense_item_id - The unique identifier of the expense item to delete
+ * @returns {Promise<void>} Promise that resolves when the deletion is complete
+ * 
+ * @throws {AppError} When the expense item is not found
+ * @throws {AppError} When the product is not found
+ * @throws {AppError} When a database error occurs during the deletion
+ */
 const deleteExpenseItem = async (expense_item_id: string): Promise<void> => {
     try {
         const expenseItem = await db.select()
