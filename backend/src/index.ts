@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import config from "./config";
 
 import productRouter from "./v1/routes/productRoutes";
@@ -12,8 +13,12 @@ import expenseRouter from "./v1/routes/expenseRoutes";
 import expenseItemRouter from "./v1/routes/expenseItemRoutes";
 
 const app = express();
+
+// Middleware
+app.use(cors());
 app.use(express.json());
 
+// Routes
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/products-category", productCategoryRouter);

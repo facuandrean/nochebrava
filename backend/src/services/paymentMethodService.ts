@@ -18,7 +18,7 @@ import { v4 as uuid } from "uuid";
  */
 const getAllPaymentMethods = async (): Promise<PaymentMethod[]> => {
   try {
-    const allPaymentMethods: PaymentMethod[] = await db.select().from(paymentMethods);
+    const allPaymentMethods: PaymentMethod[] = await db.select().from(paymentMethods).all();
     return allPaymentMethods;
   } catch (error) {
     throw new AppError("Ocurrió un error al obtener los métodos de pago.", 400, []);
@@ -88,6 +88,7 @@ const postPaymentMethod = async (dataPaymentMethod: PaymentMethodBodyPost): Prom
 const deletePaymentMethod = async (payment_method_id: string): Promise<void> => {
   try {
     await db.delete(paymentMethods).where(eq(paymentMethods.payment_method_id, payment_method_id));
+    return;
   } catch (error) {
     throw new AppError("Ocurrió un error al eliminar el método de pago.", 400, []);
   }

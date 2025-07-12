@@ -21,7 +21,7 @@ import { v4 as uuid } from "uuid";
  */
 const getPacks = async (): Promise<Pack[]> => {
   try {
-    const allPacks = await db.select().from(packs).all();
+    const allPacks: Pack[] = await db.select().from(packs).all();
     return allPacks;
   } catch (error) {
     throw new AppError("Error al obtener los packs.", 400, []);
@@ -46,7 +46,7 @@ const getPacks = async (): Promise<Pack[]> => {
  */
 const getPackById = async (pack_id: string): Promise<Pack | undefined> => {
   try {
-    const pack = await db.select().from(packs).where(eq(packs.pack_id, pack_id)).get();
+    const pack: Pack | undefined = await db.select().from(packs).where(eq(packs.pack_id, pack_id)).get();
     return pack;
   } catch (error) {
     throw new AppError("Error al obtener el pack de id " + pack_id, 400, []);
@@ -107,12 +107,12 @@ const postPack = async (dataPack: PackBodyPost): Promise<Pack> => {
 const updatePack = async (pack_id: string, dataPack: PackBodyUpdate): Promise<Pack> => {
   try {
     const date = getCurrentDate();
-    const pack = await db.update(packs)
+    const updatedPack = await db.update(packs)
       .set({ ...dataPack, updated_at: date })
       .where(eq(packs.pack_id, pack_id))
       .returning()
       .get();
-    return pack;
+    return updatedPack;
   } catch (error) {
     throw new AppError("Error al actualizar el pack.", 400, []);
   }
@@ -135,6 +135,7 @@ const updatePack = async (pack_id: string, dataPack: PackBodyUpdate): Promise<Pa
 const deletePack = async (pack_id: string): Promise<void> => {
   try {
     await db.delete(packs).where(eq(packs.pack_id, pack_id));
+    return;
   } catch (error) {
     throw new AppError("Error al eliminar el pack.", 400, []);
   }

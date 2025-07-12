@@ -17,7 +17,7 @@ import { v4 as uuid } from "uuid";
  */
 const getPackItems = async (): Promise<PackItem[]> => {
   try {
-    const allPackItems = await db.select().from(packItems).all();
+    const allPackItems: PackItem[] = await db.select().from(packItems).all();
     return allPackItems;
   } catch (error) {
     throw new AppError("Error al obtener los items de packs.", 400, []);
@@ -36,7 +36,7 @@ const getPackItems = async (): Promise<PackItem[]> => {
  */
 const getPackItemById = async (pack_item_id: string): Promise<PackItem | undefined> => {
   try {
-    const packItem = await db.select().from(packItems).where(eq(packItems.pack_item_id, pack_item_id)).get();
+    const packItem: PackItem | undefined = await db.select().from(packItems).where(eq(packItems.pack_item_id, pack_item_id)).get();
     return packItem;
   } catch (error) {
     throw new AppError("Error al obtener el item de pack de id " + pack_item_id, 400, []);
@@ -55,8 +55,8 @@ const getPackItemById = async (pack_item_id: string): Promise<PackItem | undefin
  */
 const getPackItemsByPackId = async (pack_id: string): Promise<PackItem[]> => {
   try {
-    const packItemsList = await db.select().from(packItems).where(eq(packItems.pack_id, pack_id)).all();
-    return packItemsList;
+    const packItemsByPack: PackItem[] = await db.select().from(packItems).where(eq(packItems.pack_id, pack_id)).all();
+    return packItemsByPack;
   } catch (error) {
     throw new AppError("Error al obtener los items del pack de id " + pack_id, 400, []);
   }
@@ -75,7 +75,9 @@ const getPackItemsByPackId = async (pack_id: string): Promise<PackItem[]> => {
  */
 const getPackItemByPackAndProduct = async (pack_id: string, product_id: string): Promise<PackItem | undefined> => {
   try {
-    const packItem = await db.select().from(packItems).where(and(eq(packItems.pack_id, pack_id), eq(packItems.product_id, product_id))).get();
+    const packItem: PackItem | undefined = await db.select().from(packItems)
+      .where(and(eq(packItems.pack_id, pack_id), eq(packItems.product_id, product_id)))
+      .get();
     return packItem;
   } catch (error) {
     throw new AppError("Error al obtener el item de pack.", 400, []);
@@ -94,13 +96,25 @@ const getPackItemByPackAndProduct = async (pack_id: string, product_id: string):
  */
 const postPackItem = async (dataPackItem: PackItemBodyPost): Promise<PackItem> => {
   try {
-    const date = getCurrentDate();
+    // Check if pack item already exists
+    const existingPackItem = await getPackItemByPackAndProduct(dataPackItem.pack_id, dataPackItem.product_id);
+
+    if (existingPackItem) {
+      // Update quantity if item already exists
+      const newQuantity = existingPackItem.quantity + dataPackItem.quantity;
+      const updatedPackItem = await db.update(packItems)
+        .set({ quantity: newQuantity })
+        .where(eq(packItems.pack_item_id, existingPackItem.pack_item_id))
+        .returning()
+        .get();
+      return updatedPackItem;
+    }
+
+    // Create new pack item
     const newPackItem = {
       pack_item_id: uuid(),
-      ...dataPackItem,
-      created_at: date,
-      updated_at: date
-    }
+      ...dataPackItem
+    };
 
     const packItem: PackItem = await db.insert(packItems).values(newPackItem).returning().get();
     return packItem;
@@ -147,6 +161,7 @@ const updatePackItem = async (pack_item_id: string, dataPackItem: PackItemBodyUp
 const deletePackItem = async (pack_item_id: string): Promise<void> => {
   try {
     await db.delete(packItems).where(eq(packItems.pack_item_id, pack_item_id));
+    return;
   } catch (error) {
     throw new AppError("Error al eliminar el item de pack.", 400, []);
   }

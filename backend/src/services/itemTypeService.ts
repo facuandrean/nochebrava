@@ -3,6 +3,7 @@ import { db } from "../database/database";
 import { itemTypes } from "../database/db/itemTypeScheme";
 import { AppError } from "../errors";
 import type { ItemType, ItemTypeBody } from "../types/types";
+import { getCurrentDate } from "../utils/date";
 import { v4 as uuid } from "uuid";
 
 /**
@@ -17,8 +18,7 @@ import { v4 as uuid } from "uuid";
  */
 const getAllItemTypes = async (): Promise<ItemType[]> => {
     try {
-        const allItemTypes = await db.select().from(itemTypes);
-
+        const allItemTypes: ItemType[] = await db.select().from(itemTypes).all();
         return allItemTypes;
     } catch (error) {
         throw new AppError("Error al obtener los tipos de items.", 400, []);
@@ -38,8 +38,7 @@ const getAllItemTypes = async (): Promise<ItemType[]> => {
  */
 const getItemTypeById = async (item_type_id: string): Promise<ItemType | undefined> => {
     try {
-        const itemType = await db.select().from(itemTypes).where(eq(itemTypes.item_type_id, item_type_id)).get();
-
+        const itemType: ItemType | undefined = await db.select().from(itemTypes).where(eq(itemTypes.item_type_id, item_type_id)).get();
         return itemType;
     } catch (error) {
         throw new AppError("Error al obtener el tipo de item.", 400, []);
@@ -50,21 +49,24 @@ const getItemTypeById = async (item_type_id: string): Promise<ItemType | undefin
  * Creates a new item type in the database.
  * 
  * @description This function creates a new item type with the provided data.
- * Automatically generates a new UUID for the item_type_id.
+ * Automatically generates a new UUID for the item_type_id and inserts the record into the database.
  * Returns the complete item type object with the generated ID.
  * 
- * @param {ItemTypeBody} itemTypeBody - The item type data (name)
+ * @param {ItemTypeBody} dataItemType - The item type data without the ID (name, timestamps)
  * @returns {Promise<ItemType>} Promise that resolves to the created ItemType object
  * 
  * @throws {AppError} When a database error occurs during the insertion
  */
-const postItemType = async (itemTypeBody: ItemTypeBody): Promise<ItemType> => {
+const postItemType = async (dataItemType: ItemTypeBody): Promise<ItemType> => {
     try {
+        const date = getCurrentDate();
         const newItemType = {
             item_type_id: uuid(),
-            name: itemTypeBody.name
+            ...dataItemType,
+            created_at: date,
+            updated_at: date
         }
-        const itemType = await db.insert(itemTypes).values(newItemType).returning().get();
+        const itemType: ItemType = await db.insert(itemTypes).values(newItemType).returning().get();
         return itemType;
     } catch (error) {
         throw new AppError("Error al crear el tipo de item.", 400, []);
@@ -75,22 +77,24 @@ const postItemType = async (itemTypeBody: ItemTypeBody): Promise<ItemType> => {
  * Updates an existing item type in the database.
  * 
  * @description This function updates an item type's data in the database using its item_type_id.
- * Only updates the fields provided in the itemTypeBody parameter.
+ * Only updates the fields provided in the dataItemType parameter.
  * Returns the updated item type object with all current data.
  * 
  * @param {string} item_type_id - The unique identifier of the item type to update
- * @param {ItemTypeBody} itemTypeBody - The item type data to update (name)
+ * @param {ItemTypeBody} dataItemType - The item type data to update
  * @returns {Promise<ItemType>} Promise that resolves to the updated ItemType object
  * 
  * @throws {AppError} When a database error occurs during the update
  */
-const updateItemType = async (item_type_id: string, itemTypeBody: ItemTypeBody): Promise<ItemType> => {
+const updateItemType = async (item_type_id: string, dataItemType: ItemTypeBody): Promise<ItemType> => {
     try {
-        const updatedItemType = {
-            name: itemTypeBody.name
-        }
-        const itemType = await db.update(itemTypes).set(updatedItemType).where(eq(itemTypes.item_type_id, item_type_id)).returning().get();
-        return itemType;
+        const date = getCurrentDate();
+        const updatedItemType = await db.update(itemTypes)
+            .set({ ...dataItemType, updated_at: date })
+            .where(eq(itemTypes.item_type_id, item_type_id))
+            .returning()
+            .get();
+        return updatedItemType;
     } catch (error) {
         throw new AppError("Error al actualizar el tipo de item.", 400, []);
     }
@@ -110,6 +114,7 @@ const updateItemType = async (item_type_id: string, itemTypeBody: ItemTypeBody):
 const deleteItemType = async (item_type_id: string): Promise<void> => {
     try {
         await db.delete(itemTypes).where(eq(itemTypes.item_type_id, item_type_id));
+        return;
     } catch (error) {
         throw new AppError("Error al eliminar el tipo de item.", 400, []);
     }

@@ -3,9 +3,9 @@ import { db } from "../database/database";
 import { expenseItems } from "../database/db/expenseItemScheme";
 import { AppError } from "../errors";
 import type { ExpenseItem, ExpenseItemBody } from "../types/types";
-import { v4 as uuid } from "uuid";
 import { expenseService } from "./expenseService";
 import { productService } from "./productService";
+import { v4 as uuid } from "uuid";
 
 /**
  * Creates a new expense item in the database.
@@ -22,39 +22,33 @@ import { productService } from "./productService";
  * @throws {AppError} When the product is not found
  * @throws {AppError} When a database error occurs during the insertion
  */
-const postExpenseItem = async (expenseItemBody: ExpenseItemBody): Promise<ExpenseItem> => {
+const postExpenseItem = async (dataExpenseItem: ExpenseItemBody): Promise<ExpenseItem> => {
     try {
-        const expense = await expenseService.getExpenseById(expenseItemBody.expense_id);
+        // Verify expense exists
+        const expense = await expenseService.getExpenseById(dataExpenseItem.expense_id);
         if (!expense) {
             throw new AppError("Gasto no encontrado", 404, []);
         }
 
-        const product = await productService.getProductById(expenseItemBody.product_id);
+        // Verify product exists
+        const product = await productService.getProductById(dataExpenseItem.product_id);
         if (!product) {
             throw new AppError("Producto no encontrado", 404, []);
         }
 
-        const subtotal = expenseItemBody.quantity * expenseItemBody.unit_price;
-
         const newExpenseItem = {
             expense_item_id: uuid(),
-            expense_id: expenseItemBody.expense_id,
-            product_id: expenseItemBody.product_id,
-            quantity: expenseItemBody.quantity,
-            unit_price: expenseItemBody.unit_price,
-            subtotal: subtotal
+            ...dataExpenseItem,
+            subtotal: dataExpenseItem.quantity * dataExpenseItem.unit_price
         };
 
-        const expenseItem = await db.insert(expenseItems)
-            .values(newExpenseItem)
-            .returning()
-            .get();
+        const expenseItem: ExpenseItem = await db.insert(expenseItems).values(newExpenseItem).returning().get();
 
-        const newStock = product.stock + expenseItemBody.quantity;
-        await productService.patchProduct(product.product_id, { stock: newStock });
+        // Update product stock
+        const newStock = product.stock + dataExpenseItem.quantity;
+        await productService.patchProduct(dataExpenseItem.product_id, { stock: newStock });
 
         return expenseItem;
-
     } catch (error) {
         throw new AppError("Error al crear el item del gasto", 400, []);
     }
@@ -64,9 +58,7 @@ const postExpenseItem = async (expenseItemBody: ExpenseItemBody): Promise<Expens
  * Deletes an expense item from the database.
  * 
  * @description This function permanently removes an expense item from the database.
- * First retrieves the item to get the product and quantity information,
- * then deletes the item and updates the product stock by subtracting
- * the quantity that was previously added.
+ * First verifies that the expense item exists, then removes it and updates the product stock.
  * 
  * @param {string} expense_item_id - The unique identifier of the expense item to delete
  * @returns {Promise<void>} Promise that resolves when the deletion is complete
@@ -77,26 +69,26 @@ const postExpenseItem = async (expenseItemBody: ExpenseItemBody): Promise<Expens
  */
 const deleteExpenseItem = async (expense_item_id: string): Promise<void> => {
     try {
-        const expenseItem = await db.select()
-            .from(expenseItems)
-            .where(eq(expenseItems.expense_item_id, expense_item_id))
-            .get();
-
+        // Get the expense item to know the product and quantity
+        const expenseItem = await db.select().from(expenseItems).where(eq(expenseItems.expense_item_id, expense_item_id)).get();
         if (!expenseItem) {
             throw new AppError("Item del gasto no encontrado", 404, []);
         }
 
+        // Verify product exists
         const product = await productService.getProductById(expenseItem.product_id);
         if (!product) {
             throw new AppError("Producto no encontrado", 404, []);
         }
 
-        await db.delete(expenseItems)
-            .where(eq(expenseItems.expense_item_id, expense_item_id));
+        // Delete the expense item
+        await db.delete(expenseItems).where(eq(expenseItems.expense_item_id, expense_item_id));
 
+        // Update product stock (subtract the quantity that was added)
         const newStock = product.stock - expenseItem.quantity;
-        await productService.patchProduct(product.product_id, { stock: newStock });
+        await productService.patchProduct(expenseItem.product_id, { stock: newStock });
 
+        return;
     } catch (error) {
         throw new AppError("Error al eliminar el item del gasto", 400, []);
     }

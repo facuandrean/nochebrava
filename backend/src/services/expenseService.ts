@@ -119,8 +119,9 @@ const postExpense = async (expenseBody: ExpenseBody): Promise<Expense> => {
 const deleteExpense = async (expense_id: string): Promise<void> => {
     try {
         await db.delete(expenses).where(eq(expenses.expense_id, expense_id));
+        return;
     } catch (error) {
-        throw new AppError("Error al eliminar el gasto.", 400, []);
+        throw new AppError("Error al eliminar el gasto.", 500, []);
     }
 }
 
