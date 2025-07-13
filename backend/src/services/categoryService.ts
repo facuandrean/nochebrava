@@ -2,7 +2,8 @@ import { eq } from "drizzle-orm";
 import { db } from "../database/database";
 import { categories } from "../database/db/categoryScheme";
 import { AppError } from "../errors";
-import type { Category, CategoryWithoutId, UUIDInput } from "../types/types";
+import type { Category, CategoryBodyPost, CategoryBodyUpdate, UUIDInput } from "../types/types";
+import { getCurrentDate } from "../utils/date";
 import { v4 as uuid } from "uuid";
 
 /**
@@ -56,11 +57,14 @@ const getCategoryById = async (category_id: string | UUIDInput): Promise<Categor
  * 
  * @throws {AppError} When a database error occurs during the insertion
  */
-const postCategory = async (dataCategory: CategoryWithoutId): Promise<Category> => {
+const postCategory = async (dataCategory: CategoryBodyPost): Promise<Category> => {
   try {
+    const date = getCurrentDate();
     const newCategory: Category = {
       category_id: uuid(),
-      ...dataCategory
+      ...dataCategory,
+      created_at: date,
+      updated_at: date
     };
     const category: Category = await db.insert(categories).values(newCategory).returning().get();
     return category;
@@ -81,9 +85,14 @@ const postCategory = async (dataCategory: CategoryWithoutId): Promise<Category> 
  * 
  * @throws {AppError} When a database error occurs during the update
  */
-const patchCategory = async (dataCategory: Category) => {
+const patchCategory = async (category_id: string, dataCategory: CategoryBodyUpdate): Promise<Category> => {
   try {
-    const category: Category = await db.update(categories).set(dataCategory).where(eq(categories.category_id, dataCategory.category_id)).returning().get();
+    const date = getCurrentDate();
+    const category: Category = await db.update(categories)
+      .set({ ...dataCategory, updated_at: date })
+      .where(eq(categories.category_id, category_id))
+      .returning()
+      .get();
     return category;
   } catch (error) {
     throw new AppError("Ocurrió un error al actualizar la categoría.", 500, []);

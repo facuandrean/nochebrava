@@ -8,3 +8,8 @@ export const getCurrentDate = (): string => {
   dateFormatted.setHours(dateFormatted.getHours() - 3);
   return dateFormatted.toISOString();
 }
+
+export const isValidDate = (dateString: string): boolean => {
+  const date = new Date(dateString);
+  return date instanceof Date && !isNaN(date.getTime());
+};

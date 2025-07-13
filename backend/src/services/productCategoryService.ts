@@ -43,11 +43,10 @@ const getProductsByCategory = async (categoryId: UUIDInput): Promise<Product[]> 
 }
 
 /**
- * Retrieves all categories by product from the database.
+ * Retrieves all categories for a specific product.
  * 
- * @description This function fetches all categories that are assigned to a specific product
- * using a JOIN between categories and productCategories tables.
- * Returns an array of categories or an empty array if no categories are found.
+ * @description This function fetches all categories associated with a given product_id.
+ * Returns an array of categories or an empty array if none exist.
  * 
  * @param {string} productId - The ID of the product to retrieve categories from
  * @returns {Promise<Category[]>} Promise that resolves to an array of Category objects
