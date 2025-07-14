@@ -1,9 +1,7 @@
 import type { Request, Response } from "express";
 import { AppError } from "../errors";
-import type { Order, OrderBodyPost, OrderWithoutId } from "../types/types";
+import type { Order, OrderBodyPost } from "../types/types";
 import { orderService } from "../services/orderService";
-import { getCurrentDate } from "../utils/date";
-// import { meteor } from "globals";
 
 const getOrders = async (_req: Request, res: Response): Promise<void> => {
   try {
@@ -38,8 +36,8 @@ const getOrders = async (_req: Request, res: Response): Promise<void> => {
     res.status(500).json({
       status: "Operación fallida",
       message: "Ocurrió un error al obtener las ordenes.",
+      data: []
     });
-    // PREGUNTAR porque maneja estado 500 
     return;
   }
 }
@@ -47,6 +45,7 @@ const getOrders = async (_req: Request, res: Response): Promise<void> => {
 const getOrderById = async (req: Request, res: Response): Promise<void> => {
   try {
     const order_id = req.params.order_id as string;
+
     const order: Order | undefined = await orderService.getOrderById(order_id);
 
     if (!order) {
@@ -78,6 +77,7 @@ const getOrderById = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({
       status: "Operación fallida",
       message: "Ocurrió un error al obtener la orden.",
+      data: []
     });
     return;
   }
@@ -85,15 +85,9 @@ const getOrderById = async (req: Request, res: Response): Promise<void> => {
 
 const postOrder = async (req: Request, res: Response): Promise<void> => {
   try {
-    const date = getCurrentDate();
-    const dataOrder: OrderBodyPost = req.body;
+    const dataOrder = req.body as OrderBodyPost;
 
-    const newOrder: OrderWithoutId = {
-      ...dataOrder,
-      created_at: date,
-    }
-
-    const order: Order = await orderService.postOrder(newOrder);
+    const order: Order = await orderService.postOrder(dataOrder);
 
     res.status(201).json({
       status: "Operación exitosa.",

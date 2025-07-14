@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { validateBody } from "../../middlewares/validateBody";
-import { ordersController } from "../../controllers/ordersController";
+import { ordersController } from "../../controllers/orderController";
 import { orderPostSchema } from "../../schemas/orderSchema";
 
 const orderRouter = Router();

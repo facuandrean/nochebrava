@@ -26,12 +26,14 @@ const getOrderById = async (order_id: string | UUIDInput): Promise<Order | undef
 
 const postOrder = async (dataOrder: OrderBodyPost): Promise<Order> => {
   try {
+
     const newOrder: Order = {
       order_id: uuid(),
       date: getCurrentDate(),
       created_at: getCurrentDate(),
       ...dataOrder
     };
+
     const order: Order = await db.insert(orders).values(newOrder).returning().get();
     return order;
   } catch (error) {

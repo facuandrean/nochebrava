@@ -7,6 +7,5 @@ export const orders = sqliteTable("orders", {
   date: text("date").notNull().default(sql`CURRENT_TIMESTAMP`),
   total: real("total").notNull(),
   created_at: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-  //foreign key a tablas paymentMethods
   payment_method_id: text("payment_method_id").notNull().references(() => paymentMethods.method_id)
 })
