@@ -158,9 +158,51 @@ const deleteOrder = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
+const getOrderWithDetails = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const order_id = req.params.order_id as string;
+
+    const orderWithDetails = await orderService.getOrderWithDetails(order_id);
+
+    if (!orderWithDetails) {
+      res.status(404).json({
+        status: "Operación fallida",
+        message: "No se encontró la orden.",
+        data: []
+      });
+      return;
+    }
+
+    res.status(200).json({
+      status: "Operación exitosa.",
+      message: "Orden con detalles obtenida correctamente.",
+      data: orderWithDetails
+    });
+    return;
+
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.status).json({
+        status: "Operación fallida",
+        message: error.message,
+        data: error.data
+      });
+      return;
+    }
+
+    res.status(500).json({
+      status: "Operación fallida",
+      message: "Ocurrió un error al obtener la orden con sus detalles.",
+      data: []
+    });
+    return;
+  }
+}
+
 export const ordersController = {
   getOrders,
   getOrderById,
+  getOrderWithDetails,
   postOrder,
   deleteOrder
 }

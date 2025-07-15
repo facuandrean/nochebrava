@@ -47,7 +47,7 @@ export type OrderBodyPost = Input<typeof orderPostSchema>;
 
 export type DetailOrder = InferModel<typeof detailOrders>;
 export type DetailOrderWithoutId = Omit<DetailOrder, "detail_order_id">;
-export type DetailOrderBodyPost = Input<typeof detailOrderPostSchema>;
+export type DetailOrderBody = Input<typeof detailOrderPostSchema>;
 
 export type Pack = InferModel<typeof packs>;
 export type PackWithoutId = Omit<Pack, "pack_id">;

@@ -1,6 +1,7 @@
 import { db } from "../database/database";
 import { orders } from "../database/db/orderScheme";
-import type { Order, OrderBodyPost, UUIDInput } from "../types/types";
+import { detailOrders } from "../database/db/detailOrderScheme";
+import type { Order, OrderBodyPost, UUIDInput, DetailOrder } from "../types/types";
 import { AppError } from "../errors";
 import { v4 as uuid } from "uuid";
 import { eq } from "drizzle-orm";
@@ -50,9 +51,31 @@ const deleteOrder = async (order_id: string): Promise<void> => {
   }
 };
 
+/**
+ * Obtiene una orden con todos sus detalles
+ */
+const getOrderWithDetails = async (order_id: string | UUIDInput): Promise<{ order: Order; detailOrders: DetailOrder[] } | undefined> => {
+  try {
+    // Obtener la orden
+    const order: Order | undefined = await db.select().from(orders).where(eq(orders.order_id, order_id)).get();
+    if (!order) return undefined;
+
+    // Obtener todos los detalles de la orden
+    const detailOrdersList: DetailOrder[] = await db.select().from(detailOrders).where(eq(detailOrders.order_id, order_id)).all();
+
+    return {
+      order,
+      detailOrders: detailOrdersList
+    };
+  } catch (error) {
+    throw new AppError("Ocurrió un error al obtener la orden con sus detalles.", 400, []);
+  }
+}
+
 export const orderService = {
   getOrders,
   getOrderById,
+  getOrderWithDetails,
   postOrder,
   deleteOrder
 }

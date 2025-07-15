@@ -7,6 +7,7 @@ const orderRouter = Router();
 
 orderRouter.get("/", ordersController.getOrders);
 orderRouter.get("/:order_id", ordersController.getOrderById);
+orderRouter.get("/:order_id/with-details", ordersController.getOrderWithDetails);
 orderRouter.post("/", validateBody(false, orderPostSchema, orderPostSchema), ordersController.postOrder);
 orderRouter.delete("/:order_id", ordersController.deleteOrder);
 
