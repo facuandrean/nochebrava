@@ -1,10 +1,12 @@
-import { useState } from "react";
 import { Button } from "../button/button";
 import "./header.css";
 
-export const Header = () => {
+interface HeaderProps {
+  isMenuOpen: boolean;
+  setIsMenuOpen: (isMenuOpen: boolean) => void;
+}
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+export const Header = ({ isMenuOpen, setIsMenuOpen }: HeaderProps) => {
 
   const handleMenuOpen = () => {
     setIsMenuOpen(!isMenuOpen);
