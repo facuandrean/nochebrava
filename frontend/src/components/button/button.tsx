@@ -7,7 +7,7 @@ interface Props {
 
 export const Button = ({ label, parentMethod }: Props) => {
   return (
-    <button className="custom-button" onClick={parentMethod}>
+    <button className="button" onClick={parentMethod}>
       {label}
     </button>
   )

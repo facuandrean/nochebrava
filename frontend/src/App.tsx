@@ -1,5 +1,5 @@
 import './App.css'
-import { Button } from './components';
+import { Header } from './components/header/header';
 import { useFetch } from './hooks';
 
 interface Product {
@@ -36,10 +36,7 @@ function App() {
 
   return (
     <>
-      <div>
-        <Button label="Cargar productos" parentMethod={() => { }} />
-        <Button label="Cargar categorías" parentMethod={() => { }} />
-      </div>
+      <Header />
       <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
         {data.data.map((product) => (
           <div
