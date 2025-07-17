@@ -1,4 +1,5 @@
 import { useFetch } from "../../hooks";
+import "./category.css";
 
 interface Category {
   category_id: string;

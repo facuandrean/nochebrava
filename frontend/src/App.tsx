@@ -1,10 +1,8 @@
 import './App.css';
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Header, Menu } from './components';
+import { Categories, Header, Menu, Products } from './components';
 import { useState } from 'react';
-import { Products } from './components/product/product';
-import { Categories } from './components/category/category';
 
 
 function App() {
