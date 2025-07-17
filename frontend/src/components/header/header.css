@@ -15,6 +15,14 @@
   font-weight: bold;
 }
 
+.header-menu {
+  display: none;
+}
+
+.header-registerSale {
+  display: block;
+}
+
 .button {
   background-color: rgb(126, 187, 34);
   color: rgb(0, 0, 0);
@@ -29,4 +37,24 @@
 .button:focus {
   border: 1px solid rgb(63, 92, 19);
   outline: none;
+}
+
+.hamburger:focus {
+  outline: none;
+}
+
+.hamburger-inner,
+.hamburger-inner:after,
+.hamburger-inner:before {
+  background-color: rgb(255, 255, 255) !important;
+}
+
+@media (width <=375px) {
+  .header-menu {
+    display: block;
+  }
+
+  .header-registerSale {
+    display: none;
+  }
 }
