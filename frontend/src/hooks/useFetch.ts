@@ -32,6 +32,8 @@ export const useFetch = <T>(url: string): Params<T> => {
   useEffect(() => {
     // Lo que queremos que se ejecute cada vez que cambie la URL, en este caso, el fetchData
 
+    if (!url) return;
+
     // Se crea un controlador de abortación para cancelar la petición si es necesario, por ejemplo, cuando se interrumpe la llamada a la API, la idea es cancelar la petición.
     const controller = new AbortController();
 

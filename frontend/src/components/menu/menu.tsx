@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./menu.css";
 
 interface MenuProps {
@@ -13,10 +14,10 @@ export const Menu = ({ isMenuOpen }: MenuProps) => {
           <a href="/">Inicio</a>
         </li>
         <li>
-          <a href="/productos">Productos</a>
+          <Link to="/productos">Productos</Link>
         </li>
         <li>
-          <a href="/gastos">Gastos</a>
+          <Link to="/categorias">Categorías</Link>
         </li>
         <li>
           <a href="/ventas">Ventas</a>
