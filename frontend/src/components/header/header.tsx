@@ -17,7 +17,7 @@ export const Header = () => {
   return (
     <header className="header">
       <div>
-        <span>Noche Brava</span>
+        <span className="header-logo">Noche Brava</span>
       </div>
       <div className="header-registerSale">
         <Button label="Registrar venta" parentMethod={handleRegisterSale} />

@@ -3,16 +3,25 @@
   justify-content: space-between;
   align-items: center;
 
-  height: 50px;
-  padding: 1rem;
+  height: 60px;
+  width: 100%;
 
   position: relative;
   top: 0;
 }
 
-.header span {
+.header .header-logo {
   font-size: 1.5rem;
   font-weight: bold;
+
+  height: 60px;
+  width: 12ch;
+
+  display: flex;
+  align-items: center;
+
+  padding-bottom: .25rem;
+  padding-left: 1rem;
 }
 
 .header-menu {
@@ -21,6 +30,8 @@
 
 .header-registerSale {
   display: block;
+
+  padding-right: 1rem;
 }
 
 .button {
@@ -49,9 +60,22 @@
   background-color: rgb(255, 255, 255) !important;
 }
 
-@media (width <=375px) {
+@media (width <=768px) {
   .header-menu {
     display: block;
+    padding-right: 1rem !important;
+
+    height: 100%;
+  }
+
+  .header-menu .hamburger {
+    height: 100%;
+  }
+
+  .header-menu .hamburger-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .header-registerSale {

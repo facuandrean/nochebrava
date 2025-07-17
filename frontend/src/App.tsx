@@ -37,31 +37,18 @@ function App() {
   return (
     <>
       <Header />
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+      {/* <div>
         {data.data.map((product) => (
-          <div
-            key={product.product_id}
-            style={{
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              padding: "1rem",
-              width: "250px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-            }}
-          >
-            <img
-              src={product.picture}
-              alt={product.name}
-              style={{ width: "100%", height: "150px", objectFit: "cover", borderRadius: "4px" }}
-            />
-            <h2 style={{ fontSize: "1.2rem", margin: "0.5rem 0" }}>{product.name}</h2>
+          <div key={product.product_id}>
+            <img src={product.picture} alt={product.name} />
+            <h2>{product.name}</h2>
             <p>{product.description}</p>
             <p><b>Precio:</b> ${product.price}</p>
             <p><b>Stock:</b> {product.stock}</p>
             <p><b>Activo:</b> {product.active ? "Sí" : "No"}</p>
           </div>
         ))}
-      </div>
+      </div> */}
     </>
   );
 }
