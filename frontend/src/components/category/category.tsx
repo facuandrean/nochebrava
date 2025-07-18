@@ -1,4 +1,7 @@
 import { useFetch } from "../../hooks";
+import { handleDate } from "../../utils/date";
+import { Button } from "../button/button";
+import { Table, type Column } from "../table/table";
 import "./category.css";
 
 interface Category {
@@ -16,16 +19,30 @@ export const Categories = () => {
   if (loading) return <div>Cargando categorías...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
+  const columns: Column<Category>[] = [
+    { header: "ID", accessor: "category_id" },
+    { header: "Nombre", accessor: "name" },
+    { header: "Descripción", accessor: "description" },
+    { header: "Creado", accessor: "created_at" },
+    { header: "Actualizado", accessor: "updated_at" }
+  ]
+
+  const handleData: Category[] = data?.data.map((category) => {
+    return {
+      ...category,
+      created_at: handleDate(category.created_at),
+      updated_at: handleDate(category.updated_at)
+    }
+  }) ?? [];
+
   return (
     <div className="section">
       <h2 className="section-title">Categorías</h2>
-      <ul>
-        {data?.data.map((category) => (
-          <li key={category.category_id}>
-            <b>{category.name}</b> - {category.description}
-          </li>
-        ))}
-      </ul>
+      <p className="section-description">Gestiona la carga, modificación y eliminación de las categorías de los productos.</p>
+      <Button label="Crear categoría" parentMethod={() => { }} />
+      <div className="table-container">
+        <Table columns={columns} data={handleData} />
+      </div>
     </div>
   );
 

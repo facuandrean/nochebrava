@@ -1,0 +1,37 @@
+.table-body-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+
+.button-icon {
+  width: 35px;
+  height: 35px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+
+  background-color: rgb(255, 255, 255);
+}
+
+.button-icon i {
+  color: rgb(0, 0, 0);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 10px;
+  height: 10px;
+}
+
+.button-icon:hover {
+  border: 1px solid rgb(0, 0, 0);
+}
+
+.button-icon:focus {
+  outline: none;
+}

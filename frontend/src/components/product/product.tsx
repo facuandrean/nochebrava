@@ -1,4 +1,7 @@
 import { useFetch } from "../../hooks";
+import { handleDate } from "../../utils/date";
+import { Button } from "../button/button";
+import { Table, type Column } from "../table/table";
 import "./product.css";
 
 interface Product {
@@ -7,8 +10,18 @@ interface Product {
   description: string;
   price: number;
   stock: number;
-  picture: string;
   active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ParsedProduct {
+  product_id: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  active: string;
   created_at: string;
   updated_at: string;
 }
@@ -20,16 +33,35 @@ export const Products = () => {
   if (loading) return <div>Cargando productos...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
+  const columns: Column<ParsedProduct>[] = [
+    { header: "ID", accessor: "product_id" },
+    { header: "Nombre", accessor: "name" },
+    { header: "Descripción", accessor: "description" },
+    { header: "Precio", accessor: "price" },
+    { header: "Stock", accessor: "stock" },
+    { header: "Activo", accessor: "active" },
+    { header: "Creado", accessor: "created_at" },
+    { header: "Actualizado", accessor: "updated_at" }
+  ];
+
+  const handleData: ParsedProduct[] = data?.data.map((product) => {
+    return {
+      ...product,
+      active: product.active ? "Si" : "No",
+      created_at: handleDate(product.created_at),
+      updated_at: handleDate(product.updated_at)
+    }
+  }) ?? [];
+
   return (
     <div className="section">
       <h2 className="section-title">Productos</h2>
-      <ul>
-        {data?.data.map((product) => (
-          <li key={product.product_id}>
-            <b>{product.name}</b> - ${product.price}
-          </li>
-        ))}
-      </ul>
+      <p className="section-description">Gestiona la carga, modificación y eliminación de los productos que vendes.</p>
+      <Button label="Crear producto" parentMethod={() => { }} />
+
+      <div className="table-container">
+        <Table columns={columns} data={handleData} />
+      </div>
     </div>
   );
 

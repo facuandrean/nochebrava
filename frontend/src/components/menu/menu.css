@@ -18,7 +18,6 @@
 
 .menu ul li {
   height: 2.5rem;
-  padding: 0 1rem;
 
   border: 1px solid transparent;
 
@@ -26,15 +25,24 @@
 }
 
 .menu ul li:hover {
-  border: 1px solid red;
+  border-bottom: 1px solid rgb(151, 150, 150);
 }
 
 .menu li a {
   display: flex;
   align-items: center;
 
-  width: 100%;
+  color: rgb(255, 255, 255);
+
+  width: auto;
   height: 100%;
+  padding: 0 1rem;
+
+  transition: color .2s ease-in-out;
+}
+
+.menu li a:hover {
+  color: rgb(151, 150, 150);
 }
 
 @media (width <=768px) {
