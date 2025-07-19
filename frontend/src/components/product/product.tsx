@@ -26,32 +26,35 @@ interface ParsedProduct {
   updated_at: string;
 }
 
-export const Products = () => {
+const API_URL = "http://localhost:3000/api/v1/products";
 
-  const { data, loading, error } = useFetch<{ status: string; message: string; data: Product[] }>("http://localhost:3000/api/v1/products");
+const parseProductData = (products: Product[]): ParsedProduct[] => {
+  return products.map((product) => ({
+    ...product,
+    active: product.active ? "Si" : "No",
+    created_at: handleDate(product.created_at),
+    updated_at: handleDate(product.updated_at)
+  }));
+};
+
+const columns: Column<ParsedProduct>[] = [
+  { header: "ID", accessor: "product_id" },
+  { header: "Nombre", accessor: "name" },
+  { header: "Descripción", accessor: "description" },
+  { header: "Precio", accessor: "price" },
+  { header: "Stock", accessor: "stock" },
+  { header: "Activo", accessor: "active" },
+  { header: "Creado", accessor: "created_at" },
+  { header: "Actualizado", accessor: "updated_at" }
+];
+
+export const Products = () => {
+  const { data, loading, error } = useFetch<{ status: string; message: string; data: Product[] }>(API_URL);
 
   if (loading) return <div>Cargando productos...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
-  const columns: Column<ParsedProduct>[] = [
-    { header: "ID", accessor: "product_id" },
-    { header: "Nombre", accessor: "name" },
-    { header: "Descripción", accessor: "description" },
-    { header: "Precio", accessor: "price" },
-    { header: "Stock", accessor: "stock" },
-    { header: "Activo", accessor: "active" },
-    { header: "Creado", accessor: "created_at" },
-    { header: "Actualizado", accessor: "updated_at" }
-  ];
-
-  const handleData: ParsedProduct[] = data?.data.map((product) => {
-    return {
-      ...product,
-      active: product.active ? "Si" : "No",
-      created_at: handleDate(product.created_at),
-      updated_at: handleDate(product.updated_at)
-    }
-  }) ?? [];
+  const handleData: ParsedProduct[] = parseProductData(data?.data ?? []);
 
   return (
     <div className="section">
@@ -64,5 +67,4 @@ export const Products = () => {
       </div>
     </div>
   );
-
 }

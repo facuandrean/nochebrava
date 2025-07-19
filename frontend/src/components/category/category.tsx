@@ -12,28 +12,32 @@ interface Category {
   updated_at: string;
 }
 
+const API_URL = "http://localhost:3000/api/v1/categories";
+
+const parseCategoryData = (categories: Category[]): Category[] => {
+  return categories.map((category) => ({
+    ...category,
+    created_at: handleDate(category.created_at),
+    updated_at: handleDate(category.updated_at)
+  }));
+}
+
+const columns: Column<Category>[] = [
+  { header: "ID", accessor: "category_id" },
+  { header: "Nombre", accessor: "name" },
+  { header: "Descripción", accessor: "description" },
+  { header: "Creado", accessor: "created_at" },
+  { header: "Actualizado", accessor: "updated_at" }
+]
+
 export const Categories = () => {
 
-  const { data, loading, error } = useFetch<{ status: string; message: string; data: Category[] }>("http://localhost:3000/api/v1/categories");
+  const { data, loading, error } = useFetch<{ status: string; message: string; data: Category[] }>(API_URL);
 
   if (loading) return <div>Cargando categorías...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
-  const columns: Column<Category>[] = [
-    { header: "ID", accessor: "category_id" },
-    { header: "Nombre", accessor: "name" },
-    { header: "Descripción", accessor: "description" },
-    { header: "Creado", accessor: "created_at" },
-    { header: "Actualizado", accessor: "updated_at" }
-  ]
-
-  const handleData: Category[] = data?.data.map((category) => {
-    return {
-      ...category,
-      created_at: handleDate(category.created_at),
-      updated_at: handleDate(category.updated_at)
-    }
-  }) ?? [];
+  const handleData: Category[] = parseCategoryData(data?.data ?? []);
 
   return (
     <div className="section">

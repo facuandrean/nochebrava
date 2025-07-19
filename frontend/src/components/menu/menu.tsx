@@ -19,9 +19,6 @@ export const Menu = ({ isMenuOpen }: MenuProps) => {
         <li>
           <Link to="/categorias">Categorías</Link>
         </li>
-        <li>
-          <a href="/ventas">Ventas</a>
-        </li>
       </ul>
     </nav>
   );
