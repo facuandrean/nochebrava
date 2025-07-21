@@ -1,25 +1,23 @@
 .table {
   margin: 2.5rem auto 0rem auto;
-  border: 1px solid rgb(133, 131, 131);
+
+  max-width: calc(100% - 250px);
 }
 
 .table-head {
-  background-color: rgb(133, 131, 131);
   color: rgb(255, 255, 255);
 }
 
 .table-head th {
   padding: 1rem;
-}
-
-.table-body {
-  border: 1px solid green;
+  text-align: center;
 }
 
 .table-body td {
-  padding: 1rem;
+  height: 30px;
+  padding: .8rem;
+
   text-align: center;
-  border-bottom: 1px solid rgb(133, 131, 131);
 }
 
 .table-body td:last-child {
@@ -30,15 +28,23 @@
   border-bottom: none;
 }
 
+.table-body tr td div {
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table th,
+.table td {
+  white-space: nowrap;
+  min-width: 120px;
+}
+
 @media (width <=768px) {
   .table {
     width: max-content;
     min-width: 100%;
-  }
-
-  .table th,
-  .table td {
-    white-space: nowrap;
-    min-width: 120px;
   }
 }

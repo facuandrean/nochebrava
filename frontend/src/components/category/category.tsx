@@ -1,6 +1,9 @@
 import { useFetch } from "../../hooks";
 import { handleDate } from "../../utils/date";
 import { Button } from "../button/button";
+import { Loading } from "../loading/loading";
+import { ModalPost } from "../modal/modalPost";
+import { Section } from "../section/section";
 import { Table, type Column } from "../table/table";
 import "./category.css";
 
@@ -34,20 +37,25 @@ export const Categories = () => {
 
   const { data, loading, error } = useFetch<{ status: string; message: string; data: Category[] }>(API_URL);
 
-  if (loading) return <div>Cargando categorías...</div>;
   if (error) return <div>Error: {error.message}</div>;
+  if (loading) return <Loading />;
 
   const handleData: Category[] = parseCategoryData(data?.data ?? []);
 
   return (
-    <div className="section">
-      <h2 className="section-title">Categorías</h2>
-      <p className="section-description">Gestiona la carga, modificación y eliminación de las categorías de los productos.</p>
-      <Button label="Crear categoría" parentMethod={() => { }} />
-      <div className="table-container">
-        <Table columns={columns} data={handleData} />
-      </div>
-    </div>
+    <>
+      <Section title="Categorías" description="Gestiona la carga, modificación y eliminación de las categorías de los productos.">
+        <Button label="Crear categoría" parentMethod={() => { }} dataBsToggle="modal" dataBsTarget="#createCategoryModal" />
+        <div className="table-container">
+          <Table columns={columns} data={handleData} />
+        </div>
+      </Section>
+      <ModalPost id="createCategoryModal" title="Crear categoría" onSubmit={() => { }}>
+        <div>
+          <p>Acá iria un formulario para crear una categoría</p>
+        </div>
+      </ModalPost>
+    </>
   );
 
 }

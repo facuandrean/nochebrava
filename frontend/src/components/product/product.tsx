@@ -1,10 +1,14 @@
 import { useFetch } from "../../hooks";
 import { handleDate } from "../../utils/date";
 import { Button } from "../button/button";
+import { Form } from "../form/form";
+import { Loading } from "../loading/loading";
+import { ModalPost } from "../modal/modalPost";
+import { Section } from "../section/section";
 import { Table, type Column } from "../table/table";
 import "./product.css";
 
-interface Product {
+export interface Product {
   product_id: string;
   name: string;
   description: string;
@@ -15,7 +19,7 @@ interface Product {
   updated_at: string;
 }
 
-interface ParsedProduct {
+export interface ParsedProduct {
   product_id: string;
   name: string;
   description: string;
@@ -24,6 +28,14 @@ interface ParsedProduct {
   active: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface ProductRequest {
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  active: boolean;
 }
 
 const API_URL = "http://localhost:3000/api/v1/products";
@@ -51,20 +63,22 @@ const columns: Column<ParsedProduct>[] = [
 export const Products = () => {
   const { data, loading, error } = useFetch<{ status: string; message: string; data: Product[] }>(API_URL);
 
-  if (loading) return <div>Cargando productos...</div>;
   if (error) return <div>Error: {error.message}</div>;
+  if (loading) return <Loading />;
 
   const handleData: ParsedProduct[] = parseProductData(data?.data ?? []);
 
   return (
-    <div className="section">
-      <h2 className="section-title">Productos</h2>
-      <p className="section-description">Gestiona la carga, modificación y eliminación de los productos que vendes.</p>
-      <Button label="Crear producto" parentMethod={() => { }} />
-
-      <div className="table-container">
-        <Table columns={columns} data={handleData} />
-      </div>
-    </div>
+    <>
+      <Section title="Productos" description="Gestiona la carga, modificación y eliminación de los productos que vendes.">
+        <Button label="Crear producto" parentMethod={() => { }} dataBsToggle="modal" dataBsTarget="#createProductModal" />
+        <div className="table-container">
+          <Table columns={columns} data={handleData} />
+        </div>
+      </Section>
+      <ModalPost id="createProductModal" title="Crear producto">
+        <Form />
+      </ModalPost>
+    </>
   );
 }

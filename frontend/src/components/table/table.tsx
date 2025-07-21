@@ -13,8 +13,8 @@ interface TableProps<T> {
 
 export function Table<T>({ columns, data }: TableProps<T>) {
   return (
-    <table className="table">
-      <thead className="table-head">
+    <table className="table table-striped-columns table-bordered">
+      <thead className="table-head table-secondary">
         <tr>
           {columns.map((col) => (
             <th key={String(col.accessor)}>{col.header}</th>
@@ -27,7 +27,9 @@ export function Table<T>({ columns, data }: TableProps<T>) {
           <tr key={i}>
             {columns.map((col) => (
               <td key={String(col.accessor)}>
-                {String(col.accessor).includes("_id") ? i + 1 : String(row[col.accessor])}
+                <div>
+                  {String(col.accessor).includes("_id") ? i + 1 : String(row[col.accessor])}
+                </div>
               </td>
             ))}
             <td>

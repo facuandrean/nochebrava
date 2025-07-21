@@ -1,0 +1,21 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: calc(100vh - 60px);
+  width: 100vw;
+
+  padding: 0 1rem 0 250px;
+}
+
+.loading-container img {
+  width: 100px;
+  height: 100px;
+}
+
+@media (width <=768px) {
+  .loading-container {
+    padding: 0 1rem;
+  }
+}
