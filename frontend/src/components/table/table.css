@@ -1,7 +1,15 @@
-.table {
-  margin: 2.5rem auto 0rem auto;
-
+.table-container {
+  max-height: 800px;
   max-width: calc(100% - 250px);
+  margin: 2.5rem auto 0rem auto;
+}
+
+.table {
+  max-height: 700px;
+}
+
+.table-striped-columns {
+  margin-bottom: 0
 }
 
 .table-head {
@@ -11,6 +19,10 @@
 .table-head th {
   padding: 1rem;
   text-align: center;
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .table-body td {
@@ -42,9 +54,52 @@
   min-width: 120px;
 }
 
+.table-head th:nth-child(2),
+.table-body th:nth-child(2),
+.table-body td:nth-child(2) {
+  max-width: 20ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-head th:nth-child(3),
+.table-body th:nth-child(3),
+.table-body td:nth-child(3) {
+  max-width: 50ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-body tr td:nth-child(2) div,
+.table-body tr td:nth-child(3) div {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table-body tr td:nth-child(2) div span,
+.table-body tr td:nth-child(3) div span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-categories {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
 @media (width <=768px) {
+  .table-container {
+    min-width: 425px;
+    margin: 2.5rem auto 2.5rem auto;
+  }
+
   .table {
     width: max-content;
-    min-width: 100%;
+    min-width: 100%
   }
 }

@@ -42,7 +42,7 @@ export const Products = () => {
     method: "POST"
   });
 
-  if (error) return <div>Error: {error.message}</div>;
+  if (error) return <div>{error.message}</div>;
   if (loading) return <Loading className="loading-container" />;
 
   const handleData: ParsedProduct[] = parseProductData(products);
@@ -105,7 +105,7 @@ export const Products = () => {
                 rules={{
                   validate: (value: string | number | boolean) => {
                     const strValue = String(value || "");
-                    if (!strValue || strValue.trim() === "") return true; // Permite vacío
+                    if (!strValue || strValue.trim() === "") return true;
                     return strValue.trim().length >= 10 || "Debe tener al menos 10 caracteres si se proporciona.";
                   }
                 }}

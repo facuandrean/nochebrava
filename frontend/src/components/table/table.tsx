@@ -9,11 +9,12 @@ export interface Column<T> {
 interface TableProps<T> {
   columns: Column<T>[]; // array de columnas que contiene objetos de tipo Column<T>
   data: T[]; // array de datos de cierto tipo T
+  classNameEspecificTable?: string;
 }
 
-export function Table<T>({ columns, data }: TableProps<T>) {
+export function Table<T>({ columns, data, classNameEspecificTable }: TableProps<T>) {
   return (
-    <table className="table table-striped-columns table-bordered">
+    <table className={`table table-striped-columns table-bordered ${classNameEspecificTable}`}>
       <thead className="table-head table-secondary">
         <tr>
           {columns.map((col) => (
@@ -28,12 +29,14 @@ export function Table<T>({ columns, data }: TableProps<T>) {
             {columns.map((col) => (
               <td key={String(col.accessor)}>
                 <div>
-                  {String(col.accessor).includes("_id")
-                    ? i + 1
-                    : String(col.accessor).includes("description") && row[col.accessor] === null
-                      ? <span className="text-muted">Sin descripción</span>
-                      : String(row[col.accessor])
-                  }
+                  <span>
+                    {String(col.accessor).includes("_id")
+                      ? i + 1
+                      : String(col.accessor).includes("description") && row[col.accessor] === null
+                        ? <span className="text-muted">Sin descripción</span>
+                        : String(row[col.accessor])
+                    }
+                  </span>
                 </div>
               </td>
             ))}
