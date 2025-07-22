@@ -4,13 +4,14 @@ import { useEffect } from "react";
 import { InputForm } from "./components/input";
 import { type FormPostProduct, schemaFormPostProduct } from "./models/form.model";
 import { useApi } from "../../hooks/useApi";
-import type { ProductRequest } from "../product/product";
+import type { ProductRequest } from "../product/models/product.model";
 import { Loading } from "../loading/loading";
 
 export const Form = () => {
 
   const { control, handleSubmit, formState: { errors }, reset } = useForm<FormPostProduct>({
     resolver: zodResolver(schemaFormPostProduct),
+    mode: "onBlur",
     defaultValues: {
       name: "",
       description: "",
@@ -52,7 +53,7 @@ export const Form = () => {
     await trigger(productData as ProductRequest);
 
     if (error) return <div>Error: {error.message}</div>;
-    if (loading) return <Loading />;
+    if (loading) return <Loading className="loading-container" />;
   }
 
   return (
