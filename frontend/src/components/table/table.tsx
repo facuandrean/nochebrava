@@ -28,7 +28,12 @@ export function Table<T>({ columns, data }: TableProps<T>) {
             {columns.map((col) => (
               <td key={String(col.accessor)}>
                 <div>
-                  {String(col.accessor).includes("_id") ? i + 1 : String(row[col.accessor])}
+                  {String(col.accessor).includes("_id")
+                    ? i + 1
+                    : String(col.accessor).includes("description") && row[col.accessor] === null
+                      ? <span className="text-muted">Sin descripción</span>
+                      : String(row[col.accessor])
+                  }
                 </div>
               </td>
             ))}
