@@ -1,7 +1,7 @@
 export interface Product {
   product_id: string;
   name: string;
-  description: string;
+  description: string | null;
   price: number;
   stock: number;
   active: boolean;
@@ -10,9 +10,10 @@ export interface Product {
 }
 
 export interface ParsedProduct {
+  id: string;
   product_id: string;
   name: string;
-  description: string;
+  description: string | null;
   price: number;
   stock: number;
   active: string;
@@ -22,7 +23,7 @@ export interface ParsedProduct {
 
 export interface ProductRequest {
   name: string;
-  description: string;
+  description: string | null;
   price: number;
   stock: number;
   active: boolean;

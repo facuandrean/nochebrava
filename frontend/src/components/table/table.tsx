@@ -1,21 +1,29 @@
 import { ButtonIcon } from "../button/buttonIcon";
 import "./table.css";
 
-export interface Column<T> {
+// Interfaz base que garantiza que todos los tipos tengan un id
+interface BaseEntity {
+  id: string | number;
+}
+
+export interface Column<T extends BaseEntity> {
   header: string; // el nombre de la columna
   accessor: keyof T; // keyof T es un tipo que representa las claves del objeto T ("en esta columna, mostrá el valor de la propiedad X del objeto")
 }
 
-interface TableProps<T> {
+interface TableProps<T extends BaseEntity> {
   columns: Column<T>[]; // array de columnas que contiene objetos de tipo Column<T>
   data: T[]; // array de datos de cierto tipo T
   classNameEspecificTable?: string;
+  dataBsToggle?: string;
+  dataBsTargetEdit?: string;
+  dataBsTargetDelete?: string;
 }
 
-export function Table<T>({ columns, data, classNameEspecificTable }: TableProps<T>) {
+export function Table<T extends BaseEntity>({ columns, data, classNameEspecificTable, dataBsToggle, dataBsTargetEdit, dataBsTargetDelete }: TableProps<T>) {
   return (
-    <table className={`table table-striped-columns table-bordered ${classNameEspecificTable}`}>
-      <thead className="table-head table-secondary">
+    <table className={`table table-striped-columns ${classNameEspecificTable}`}>
+      <thead className="table-head table-dark">
         <tr>
           {columns.map((col) => (
             <th key={String(col.accessor)}>{col.header}</th>
@@ -42,8 +50,8 @@ export function Table<T>({ columns, data, classNameEspecificTable }: TableProps<
             ))}
             <td>
               <div className="table-body-actions">
-                <ButtonIcon icon="fa-pen-to-square" />
-                <ButtonIcon icon="fa-trash" />
+                <ButtonIcon id={String(row.id)} icon="fa-pen-to-square" parentMethod={() => { console.log(row) }} dataBsToggle={dataBsToggle} dataBsTarget={dataBsTargetEdit} />
+                <ButtonIcon id={String(row.id)} icon="fa-trash" parentMethod={() => { console.log(row) }} dataBsToggle={dataBsToggle} dataBsTarget={dataBsTargetDelete} />
               </div>
             </td>
           </tr>

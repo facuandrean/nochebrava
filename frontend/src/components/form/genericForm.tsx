@@ -4,6 +4,7 @@ import { Loading } from "../loading/loading";
 
 interface GenericFormProps<T extends FieldValues> {
   idModal: string;
+  formId: string; // Nuevo prop para el ID del formulario
   defaultValues: T;
   onSubmit: SubmitHandler<T>;
   loading?: boolean;
@@ -14,7 +15,7 @@ interface GenericFormProps<T extends FieldValues> {
   }) => React.ReactNode;
 }
 
-export const GenericForm = <T extends FieldValues>({ idModal, defaultValues, onSubmit, loading = false, error = null, children }: GenericFormProps<T>) => {
+export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultValues, onSubmit, loading = false, error = null, children }: GenericFormProps<T>) => {
 
   const { control, handleSubmit, formState: { errors }, reset } = useForm<T>({
     mode: "onBlur",
@@ -36,7 +37,7 @@ export const GenericForm = <T extends FieldValues>({ idModal, defaultValues, onS
           if (bootstrapModal) {
             bootstrapModal.hide();
           }
-          window.location.reload();
+          // window.location.reload();
         }
       }, 2000);
     }
@@ -60,16 +61,10 @@ export const GenericForm = <T extends FieldValues>({ idModal, defaultValues, onS
   }, [reset, idModal]);
 
   return (
-    <form className="form" onSubmit={handleSubmit(onSubmit)}>
-      {children({ control, errors })}
-      <div className="d-flex justify-content-end gap-2">
-        <button type="button" className="btn btn-danger" data-bs-dismiss="modal" disabled={loading}>
-          Cancelar
-        </button>
-        <button type="submit" className="btn btn-success" disabled={loading}>
-          {loading ? "Guardando..." : "Guardar"}
-        </button>
-      </div>
+    <>
+      <form id={formId} className="form" onSubmit={handleSubmit(onSubmit)}>
+        {children({ control, errors })}
+      </form>
 
       {loading && (
         <div className="d-flex justify-content-center mt-3">
@@ -85,9 +80,9 @@ export const GenericForm = <T extends FieldValues>({ idModal, defaultValues, onS
 
       {error && !loading && (
         <div className="mt-3 p-2 text-center" style={{ backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px' }}>
-          Error: {error.message}
+          {error.message}
         </div>
       )}
-    </form>
+    </>
   )
 }

@@ -7,6 +7,7 @@ import type { Product, ParsedProduct } from "../models";
 export const parseProductData = (products: Product[]): ParsedProduct[] => {
   return products.map((product) => ({
     ...product,
+    id: product.product_id,
     active: product.active ? "Si" : "No",
     created_at: handleDate(product.created_at),
     updated_at: handleDate(product.updated_at)

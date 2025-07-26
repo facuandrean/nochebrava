@@ -4,15 +4,14 @@ import { ModalPost } from "../modal/modalPost";
 import { Section } from "../section/section";
 import { Table, type Column } from "../table/table";
 import "./category.css";
-import type { Category, CategoryRequest } from "./models";
-import { useCategory } from "./hooks";
+import type { Category, CategoryRequest, ParsedCategory } from "./models";
 import { parseCategoryData } from "./utils";
 import { useApi } from "../../hooks";
 import type { SubmitHandler } from "react-hook-form";
-import { GenericForm } from "../form/genericForm";
-import { InputForm } from "../form/components/genericInput";
+import { FormCategory } from "./components/formCategory";
+import { ModalEdit } from "../modal/modalEdit";
 
-const columns: Column<Category>[] = [
+const columns: Column<ParsedCategory>[] = [
   { header: "ID", accessor: "category_id" },
   { header: "Nombre", accessor: "name" },
   { header: "Descripción", accessor: "description" },
@@ -20,37 +19,32 @@ const columns: Column<Category>[] = [
   { header: "Actualizado", accessor: "updated_at" }
 ]
 
-const defaultValues: CategoryRequest = {
-  name: "",
-  description: ""
-}
-
-const url = "http://localhost:3000/api/v1/categories";
-
 export const Categories = () => {
 
-  const { categories, loading, error } = useCategory();
+  const { data, loading, error } = useApi<{ status: string, message: string, data: Category[] }>({
+    url: "http://localhost:3000/api/v1/categories",
+    method: "GET",
+    autoFetch: true
+  });
 
   const { trigger, loading: apiLoading, error: apiError } = useApi<CategoryRequest>({
-    url,
+    url: "http://localhost:3000/api/v1/categories",
     method: "POST"
   });
 
   if (error) return <div>{error.message}</div>;
   if (loading) return <Loading className="loading-container" />;
 
-  const handleData: Category[] = parseCategoryData(categories);
+  const categories = data?.data || [];
+  const handleData: ParsedCategory[] = parseCategoryData(categories);
 
   const onSubmit: SubmitHandler<CategoryRequest> = async (formData: CategoryRequest) => {
-    const categoryData: Partial<CategoryRequest> = {
-      name: formData.name,
-      description: formData.description
-    };
+    const productData: Partial<CategoryRequest> = {};
+    if (formData.name) productData.name = formData.name;
+    if (formData.description && formData.description.trim().length >= 10) productData.description = formData.description.trim();
 
-    if (formData.description && formData.description.trim().length >= 10) categoryData.description = formData.description.trim();
-
-    await trigger(categoryData as CategoryRequest);
-  }
+    await trigger(productData as CategoryRequest);
+  };
 
 
   return (
@@ -59,54 +53,32 @@ export const Categories = () => {
         <Button label="Crear categoría" parentMethod={() => { }} dataBsToggle="modal" dataBsTarget="#createCategoryModal" />
         <div className="table-container">
           {categories.length > 0 ? (
-            <Table columns={columns} data={handleData} classNameEspecificTable="table-categories" />
+            <Table columns={columns} data={handleData} classNameEspecificTable="table-categories" dataBsToggle="modal" dataBsTargetEdit="#editCategoryModal" dataBsTargetDelete="#deleteCategoryModal" />
           ) : (
             <Loading className="table-container-loading" />
           )}
         </div>
       </Section>
-      <ModalPost id="createCategoryModal" title="Crear categoría">
-        <GenericForm<CategoryRequest>
+
+      <ModalPost id="createCategoryModal" title="Crear categoría" formId="createCategoryForm" loading={apiLoading}>
+        <FormCategory
           idModal="createCategoryModal"
-          defaultValues={defaultValues}
+          formId="createCategoryForm"
           onSubmit={onSubmit}
-          loading={apiLoading}
-          error={apiError}
-        >
-          {({ control, errors }) => (
-            <>
-              <InputForm
-                name="name"
-                label="Nombre de la categoría"
-                control={control}
-                errors={errors}
-                type="text"
-                rules={{
-                  required: "El nombre es obligatorio",
-                  minLength: {
-                    value: 3,
-                    message: "Debe obtener al menos 3 caracteres."
-                  }
-                }}
-              />
-              <InputForm
-                name="description"
-                label="Descripción de la categoría"
-                control={control}
-                errors={errors}
-                type="textarea"
-                rules={{
-                  validate: (value: string | number | boolean) => {
-                    const strValue = String(value || "");
-                    if (!strValue || strValue.trim() === "") return true;
-                    return strValue.trim().length >= 10 || "Debe tener al menos 10 caracteres si se proporciona.";
-                  }
-                }}
-              />
-            </>
-          )}
-        </GenericForm>
+          apiLoading={apiLoading}
+          apiError={apiError}
+        />
       </ModalPost>
+
+      <ModalEdit id="editCategoryModal" title="Editar categoría" formId="editCategoryForm" loading={apiLoading}>
+        <FormCategory
+          idModal="editCategoryModal"
+          formId="editCategoryForm"
+          onSubmit={onSubmit}
+          apiLoading={apiLoading}
+          apiError={apiError}
+        />
+      </ModalEdit>
     </>
   );
 
