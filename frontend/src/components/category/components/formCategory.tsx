@@ -14,49 +14,57 @@ interface FormCategoryProps {
   onSubmit: SubmitHandler<CategoryRequest>;
   apiLoading: boolean;
   apiError: Error | null;
+  mode: "create" | "edit" | "delete";
+  initialValues?: CategoryRequest;
 }
 
-export const FormCategory = ({ idModal, formId, onSubmit, apiLoading, apiError }: FormCategoryProps) => {
+export const FormCategory = ({ idModal, formId, onSubmit, apiLoading, apiError, mode, initialValues }: FormCategoryProps) => {
   return (
     <GenericForm<CategoryRequest>
       idModal={idModal}
       formId={formId}
-      defaultValues={defaultValues}
+      defaultValues={initialValues || defaultValues}
       onSubmit={onSubmit}
       loading={apiLoading}
       error={apiError}
     >
       {({ control, errors }) => (
-        <>
-          <InputForm
-            name="name"
-            label="Nombre de la categoría"
-            control={control}
-            errors={errors}
-            type="text"
-            rules={{
-              required: "El nombre es obligatorio",
-              minLength: {
-                value: 3,
-                message: "Debe obtener al menos 3 caracteres."
-              }
-            }}
-          />
-          <InputForm
-            name="description"
-            label="Descripción de la categoría"
-            control={control}
-            errors={errors}
-            type="textarea"
-            rules={{
-              validate: (value: string | number | boolean | null) => {
-                const strValue = String(value || "");
-                if (!strValue || strValue.trim() === "") return true;
-                return strValue.trim().length >= 10 || "Debe tener al menos 10 caracteres si se proporciona.";
-              }
-            }}
-          />
-        </>
+        mode === "delete" ? (
+          <div>
+            <p>¿Estás seguro de querer eliminar la categoría <strong>"{initialValues?.name}"</strong>?</p>
+          </div>
+        ) : (
+          <>
+            <InputForm
+              name="name"
+              label="Nombre de la categoría"
+              control={control}
+              errors={errors}
+              type="text"
+              rules={{
+                required: "El nombre es obligatorio",
+                minLength: {
+                  value: 3,
+                  message: "Debe obtener al menos 3 caracteres."
+                }
+              }}
+            />
+            <InputForm
+              name="description"
+              label="Descripción de la categoría"
+              control={control}
+              errors={errors}
+              type="textarea"
+              rules={{
+                validate: (value: string | number | boolean | null) => {
+                  const strValue = String(value || "");
+                  if (!strValue || strValue.trim() === "") return true;
+                  return strValue.trim().length >= 3 || "Debe tener al menos 3 caracteres si se proporciona.";
+                }
+              }}
+            />
+          </>
+        )
       )}
     </GenericForm>
   );

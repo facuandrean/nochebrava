@@ -1,4 +1,4 @@
-import { minLength, object, optional, pipe, string } from "valibot";
+import { minLength, object, optional, pipe, string, check } from "valibot";
 
 export const categoryPostSchema = object({
   name: pipe(
@@ -8,7 +8,7 @@ export const categoryPostSchema = object({
   description: optional(
     pipe(
       string(),
-      minLength(5, "La descripción de la categoría debe tener al menos 3 caracteres.")
+      minLength(3, "La descripción de la categoría debe tener al menos 3 caracteres.")
     )
   )
 });
@@ -23,7 +23,10 @@ export const categoryUpdateSchema = object({
   description: optional(
     pipe(
       string(),
-      minLength(5, "La descripción de la categoría debe tener al menos 3 caracteres.")
+      check((value) => {
+        const trimmed = value.trim();
+        return trimmed === "" || trimmed.length >= 3;
+      }, "La descripción debe tener al menos 3 caracteres o estar vacía.")
     )
   )
 })

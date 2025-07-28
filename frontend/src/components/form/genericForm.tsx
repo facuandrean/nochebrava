@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, type Control, type DefaultValues, type FieldErrors, type FieldValues, type SubmitHandler } from "react-hook-form"
 import { Loading } from "../loading/loading";
 
@@ -17,19 +17,22 @@ interface GenericFormProps<T extends FieldValues> {
 
 export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultValues, onSubmit, loading = false, error = null, children }: GenericFormProps<T>) => {
 
+  // Para evitar que se resetee el formulario cuando se abre el modal
+  const previousDefaultValues = useRef<T | null>(null);
+
   const { control, handleSubmit, formState: { errors }, reset } = useForm<T>({
-    mode: "onBlur",
+    mode: "onSubmit",
     defaultValues: defaultValues as DefaultValues<T>
   });
 
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [previousLoading, setPreviousLoading] = useState(false);
 
-  // Detectar cuando termina el loading para mostrar mensaje
+
   useEffect(() => {
     if (previousLoading && !loading && !error) {
       setSubmitSuccess(true);
-      // Cerrar modal después de 2 segundos si fue exitoso
+
       setTimeout(() => {
         const modal = document.getElementById(idModal);
         if (modal) {
@@ -37,7 +40,7 @@ export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultVal
           if (bootstrapModal) {
             bootstrapModal.hide();
           }
-          // window.location.reload();
+          window.location.reload();
         }
       }, 2000);
     }
@@ -60,6 +63,14 @@ export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultVal
     }
   }, [reset, idModal]);
 
+  useEffect(() => {
+    // Solo resetear si los defaultValues realmente cambiaron
+    if (defaultValues && JSON.stringify(defaultValues) !== JSON.stringify(previousDefaultValues.current)) {
+      reset(defaultValues);
+      previousDefaultValues.current = defaultValues;
+    }
+  }, [defaultValues, reset]);
+
   return (
     <>
       <form id={formId} className="form" onSubmit={handleSubmit(onSubmit)}>
@@ -79,6 +90,7 @@ export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultVal
       )}
 
       {error && !loading && (
+        console.log('error', errors),
         <div className="mt-3 p-2 text-center" style={{ backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px' }}>
           {error.message}
         </div>

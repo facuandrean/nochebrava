@@ -18,9 +18,11 @@ interface TableProps<T extends BaseEntity> {
   dataBsToggle?: string;
   dataBsTargetEdit?: string;
   dataBsTargetDelete?: string;
+  onEdit?: (row: T) => void; // función callback para manejar la edición
+  onDelete?: (row: T) => void; // función callback para manejar la eliminación
 }
 
-export function Table<T extends BaseEntity>({ columns, data, classNameEspecificTable, dataBsToggle, dataBsTargetEdit, dataBsTargetDelete }: TableProps<T>) {
+export function Table<T extends BaseEntity>({ columns, data, classNameEspecificTable, dataBsToggle, dataBsTargetEdit, dataBsTargetDelete, onEdit, onDelete }: TableProps<T>) {
   return (
     <table className={`table table-striped-columns ${classNameEspecificTable}`}>
       <thead className="table-head table-dark">
@@ -40,7 +42,7 @@ export function Table<T extends BaseEntity>({ columns, data, classNameEspecificT
                   <span>
                     {String(col.accessor).includes("_id")
                       ? i + 1
-                      : String(col.accessor).includes("description") && row[col.accessor] === null
+                      : String(col.accessor).includes("description") && row[col.accessor] === null || row[col.accessor] === ""
                         ? <span className="text-muted">Sin descripción</span>
                         : String(row[col.accessor])
                     }
@@ -50,8 +52,24 @@ export function Table<T extends BaseEntity>({ columns, data, classNameEspecificT
             ))}
             <td>
               <div className="table-body-actions">
-                <ButtonIcon id={String(row.id)} icon="fa-pen-to-square" parentMethod={() => { console.log(row) }} dataBsToggle={dataBsToggle} dataBsTarget={dataBsTargetEdit} />
-                <ButtonIcon id={String(row.id)} icon="fa-trash" parentMethod={() => { console.log(row) }} dataBsToggle={dataBsToggle} dataBsTarget={dataBsTargetDelete} />
+                <ButtonIcon
+                  id={String(row.id)}
+                  icon="fa-pen-to-square"
+                  parentMethod={() => {
+                    onEdit?.(row);
+                  }}
+                  dataBsToggle={dataBsToggle}
+                  dataBsTarget={dataBsTargetEdit}
+                />
+                <ButtonIcon
+                  id={String(row.id)}
+                  icon="fa-trash"
+                  parentMethod={() => {
+                    onDelete?.(row);
+                  }}
+                  dataBsToggle={dataBsToggle}
+                  dataBsTarget={dataBsTargetDelete}
+                />
               </div>
             </td>
           </tr>
