@@ -25,11 +25,24 @@ export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultVal
     defaultValues: defaultValues as DefaultValues<T>
   });
 
+  console.log(error);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [previousLoading, setPreviousLoading] = useState(false);
 
 
   useEffect(() => {
+    if (previousLoading && !loading && error) {
+      setSubmitSuccess(false);
+
+      setTimeout(() => {
+        const messageError = document.querySelector(".message-error");
+        if (messageError) {
+          messageError.classList.remove("d-block");
+          messageError.classList.add("d-none");
+        }
+      }, 2000);
+    }
+
     if (previousLoading && !loading && !error) {
       setSubmitSuccess(true);
 
@@ -44,7 +57,9 @@ export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultVal
         }
       }, 2000);
     }
+
     setPreviousLoading(loading);
+
   }, [loading, error, idModal, previousLoading]);
 
   useEffect(() => {
@@ -59,6 +74,7 @@ export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultVal
 
       return () => {
         modal.removeEventListener('hidden.bs.modal', handleHidden);
+
       };
     }
   }, [reset, idModal]);
@@ -90,7 +106,7 @@ export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultVal
       )}
 
       {error && !loading && (
-        <div className="mt-3 p-2 text-center" style={{ backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px' }}>
+        <div className="mt-3 p-2 text-center d-block message-error" style={{ backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px' }}>
           {error.message}
         </div>
       )}

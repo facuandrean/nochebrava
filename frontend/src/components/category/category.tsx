@@ -92,6 +92,8 @@ export const Categories = () => {
           dataBsToggle="modal"
           dataBsTarget="#createCategoryModal" />
 
+
+
         <div className="table-container">
           {categories.length > 0 ? (
             <Table
