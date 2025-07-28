@@ -6,6 +6,7 @@
 
 .table {
   max-height: 700px;
+  min-width: 1024px;
 }
 
 .table-striped-columns {
@@ -22,7 +23,6 @@
 
   position: sticky;
   top: 0;
-  z-index: 100;
 }
 
 .table-body td {

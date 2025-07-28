@@ -10,11 +10,12 @@ import { useApi } from "../../hooks";
 import type { SubmitHandler } from "react-hook-form";
 import { FormCategory } from "./components/formCategory";
 import { ModalEdit } from "../modal/modalEdit";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ModalDelete } from "../modal/modalDelete";
+import { Filter } from "../filter/filter";
 
 const columns: Column<ParsedCategory>[] = [
-  { header: "ID", accessor: "category_id" },
+  { header: "N°", accessor: "category_id" },
   { header: "Nombre", accessor: "name" },
   { header: "Descripción", accessor: "description" },
   { header: "Creado", accessor: "created_at" },
@@ -22,6 +23,10 @@ const columns: Column<ParsedCategory>[] = [
 ]
 
 export const Categories = () => {
+
+  const [filteredData, setFilteredData] = useState<ParsedCategory[]>([]);
+  const [dataEditCategory, setDataEditCategory] = useState<ParsedCategory | null>(null);
+  const [dataDeleteCategory, setDataDeleteCategory] = useState<ParsedCategory | null>(null);
 
   const { data, loading, error } = useApi<{ status: string, message: string, data: Category[] }>({
     url: "http://localhost:3000/api/v1/categories",
@@ -34,15 +39,11 @@ export const Categories = () => {
     method: "POST"
   });
 
-  const [dataEditCategory, setDataEditCategory] = useState<ParsedCategory | null>(null);
-
   const { trigger: triggerEdit, loading: apiEditLoading, error: apiEditError } = useApi<CategoryRequest>({
     id: dataEditCategory?.category_id,
     url: "http://localhost:3000/api/v1/categories",
     method: "PATCH"
   });
-
-  const [dataDeleteCategory, setDataDeleteCategory] = useState<ParsedCategory | null>(null);
 
   const { trigger: triggerDelete, loading: apiDeleteLoading, error: apiDeleteError } = useApi<CategoryRequest>({
     id: dataDeleteCategory?.category_id,
@@ -50,11 +51,16 @@ export const Categories = () => {
     method: "DELETE"
   });
 
+  useEffect(() => {
+    if (data) {
+      const categories = data.data;
+      const parsedCategories = parseCategoryData(categories);
+      setFilteredData(parsedCategories);
+    }
+  }, [data]);
+
   if (error) return <div>{error.message}</div>;
   if (loading) return <Loading className="loading-container" />;
-
-  const categories = data?.data || [];
-  const handleData: ParsedCategory[] = parseCategoryData(categories);
 
   const onSubmit: SubmitHandler<CategoryRequest> = async (formData: CategoryRequest) => {
     const categoryData = parseCategoryDataForBackend(formData);
@@ -80,6 +86,21 @@ export const Categories = () => {
     await triggerDelete(dataDeleteCategory as CategoryRequest);
   }
 
+  const onFilterChange = (searchText: string) => {
+    const originalData = parseCategoryData(data?.data || []);
+
+    if (searchText.trim() === "") {
+      setFilteredData(originalData);
+      return;
+    }
+
+    const filtered = originalData.filter(category =>
+      category.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+
+    setFilteredData(filtered);
+  }
+
   return (
     <>
       <Section
@@ -92,23 +113,27 @@ export const Categories = () => {
           dataBsToggle="modal"
           dataBsTarget="#createCategoryModal" />
 
-
+        <Filter onFilterChange={onFilterChange} />
 
         <div className="table-container">
-          {categories.length > 0 ? (
-            <Table
-              columns={columns}
-              data={handleData}
-              classNameEspecificTable="table-categories"
-              dataBsToggle="modal"
-              dataBsTargetEdit="#editCategoryModal"
-              dataBsTargetDelete="#deleteCategoryModal"
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ) : (
-            <Loading className="table-container-loading" />
-          )}
+          {(() => {
+            if (loading) return <Loading className="table-container-loading" />;
+            if (!data?.data || data.data.length === 0) return <div className="no-results-message"><span>No hay categorías.</span></div>;
+            if (filteredData.length === 0) return <div className="no-results-message"><span>No se encontraron resultados.</span></div>;
+
+            return (
+              <Table
+                columns={columns}
+                data={filteredData}
+                classNameEspecificTable="table-categories"
+                dataBsToggle="modal"
+                dataBsTargetEdit="#editCategoryModal"
+                dataBsTargetDelete="#deleteCategoryModal"
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            )
+          })()}
         </div>
       </Section>
 

@@ -11,11 +11,12 @@ import type { SubmitHandler } from "react-hook-form";
 import { useApi } from "../../hooks/useApi";
 import { ModalEdit } from "../modal/modalEdit";
 import { FormProduct } from "./components/formProduct";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ModalDelete } from "../modal/modalDelete";
+import { Filter } from "../filter/filter";
 
 const columns: Column<ParsedProduct>[] = [
-  { header: "ID", accessor: "product_id" },
+  { header: "N°", accessor: "product_id" },
   { header: "Nombre", accessor: "name" },
   { header: "Descripción", accessor: "description" },
   { header: "Precio", accessor: "price" },
@@ -26,6 +27,10 @@ const columns: Column<ParsedProduct>[] = [
 ];
 
 export const Products = () => {
+
+  const [filteredData, setFilteredData] = useState<ParsedProduct[]>([]);
+  const [dataEditProduct, setDataEditProduct] = useState<ParsedProduct | null>(null);
+  const [dataDeleteProduct, setDataDeleteProduct] = useState<ParsedProduct | null>(null);
 
   const { data, loading, error } = useApi<{ status: string, message: string, data: Product[] }>({
     url: "http://localhost:3000/api/v1/products",
@@ -38,15 +43,11 @@ export const Products = () => {
     method: "POST"
   });
 
-  const [dataEditProduct, setDataEditProduct] = useState<ParsedProduct | null>(null);
-
   const { trigger: triggerEdit, loading: apiEditLoading, error: apiEditError } = useApi<ProductRequest>({
     id: dataEditProduct?.product_id,
     url: "http://localhost:3000/api/v1/products",
     method: "PATCH"
   });
-
-  const [dataDeleteProduct, setDataDeleteProduct] = useState<ParsedProduct | null>(null);
 
   const { trigger: triggerDelete, loading: apiDeleteLoading, error: apiDeleteError } = useApi<ProductRequest>({
     id: dataDeleteProduct?.product_id,
@@ -54,11 +55,16 @@ export const Products = () => {
     method: "DELETE"
   });
 
+  useEffect(() => {
+    if (data) {
+      const products = data.data;
+      const parsedProducts = parseProductData(products);
+      setFilteredData(parsedProducts);
+    }
+  }, [data]);
+
   if (error) return <div>{error.message}</div>;
   if (loading) return <Loading className="loading-container" />;
-
-  const products = data?.data || [];
-  const handleData: ParsedProduct[] = parseProductData(products);
 
   const onSubmit: SubmitHandler<ProductRequest> = async (formData: ProductRequest) => {
     const productData = parseProductDataForBackend(formData);
@@ -84,6 +90,21 @@ export const Products = () => {
     await triggerDelete(dataDeleteProduct as unknown as ProductRequest);
   }
 
+  const onFilterChange = (searchText: string) => {
+    const originalData = parseProductData(data?.data || []);
+
+    if (searchText.trim() === "") {
+      setFilteredData(originalData);
+      return;
+    }
+
+    const filtered = originalData.filter(product =>
+      product.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+
+    setFilteredData(filtered);
+  }
+
   return (
     <>
       <Section
@@ -96,20 +117,26 @@ export const Products = () => {
           dataBsToggle="modal"
           dataBsTarget="#createProductModal" />
 
+        <Filter onFilterChange={onFilterChange} />
+
         <div className="table-container">
-          {products.length > 0 ? (
-            <Table
-              columns={columns}
-              data={handleData}
-              classNameEspecificTable="table-products"
-              dataBsToggle="modal"
-              dataBsTargetEdit="#editProductModal"
-              dataBsTargetDelete="#deleteProductModal"
-              onEdit={onEdit}
-              onDelete={onDelete} />
-          ) : (
-            <Loading className="table-container-loading" />
-          )}
+          {(() => {
+            if (loading) return <Loading className="table-container-loading" />;
+            if (!data?.data || data.data.length === 0) return <div className="no-results-message"><span>No hay productos.</span></div>;
+            if (filteredData.length === 0) return <div className="no-results-message"><span>No se encontraron resultados.</span></div>;
+
+            return (
+              <Table
+                columns={columns}
+                data={filteredData}
+                classNameEspecificTable="table-products"
+                dataBsToggle="modal"
+                dataBsTargetEdit="#editProductModal"
+                dataBsTargetDelete="#deleteProductModal"
+                onEdit={onEdit}
+                onDelete={onDelete} />
+            )
+          })()}
         </div>
       </Section>
 

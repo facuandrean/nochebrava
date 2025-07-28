@@ -25,10 +25,8 @@ export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultVal
     defaultValues: defaultValues as DefaultValues<T>
   });
 
-  console.log(error);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [previousLoading, setPreviousLoading] = useState(false);
-
 
   useEffect(() => {
     if (previousLoading && !loading && error) {
