@@ -1,5 +1,5 @@
 import { handleDate } from "../../../utils/date";
-import type { Product, ParsedProduct } from "../models";
+import type { Product, ParsedProduct, ProductRequest } from "../models";
 
 /**
  * Parsea los datos del producto para mostrar en la tabla
@@ -13,6 +13,29 @@ export const parseProductData = (products: Product[]): ParsedProduct[] => {
     updated_at: handleDate(product.updated_at)
   }));
 };
+
+/**
+ * Parsea los datos del producto para enviar al backend
+ */
+export const parseProductDataForBackend = (formData: ProductRequest): Partial<ProductRequest> => {
+  const productData: Partial<ProductRequest> = {};
+
+  if (formData.name) productData.name = formData.name;
+  if (formData.description && formData.description.trim().length >= 10) {
+    productData.description = formData.description.trim();
+  } else {
+    productData.description = "";
+  }
+  if (formData.price) {
+    productData.price = Number(formData.price)
+  } else {
+    productData.price = 0;
+  }
+  productData.stock = Number(formData.stock);
+  productData.active = formData.active;
+
+  return productData;
+}
 
 /**
  * Valida si el producto tiene stock disponible

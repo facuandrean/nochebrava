@@ -90,7 +90,6 @@ export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultVal
       )}
 
       {error && !loading && (
-        console.log('error', errors),
         <div className="mt-3 p-2 text-center" style={{ backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px' }}>
           {error.message}
         </div>

@@ -1,4 +1,4 @@
-import { boolean, minLength, minValue, number, object, optional, pipe, string } from "valibot";
+import { boolean, check, minLength, minValue, number, object, optional, pipe, string } from "valibot";
 
 export const productPostSchema = object({
   name: pipe(
@@ -8,7 +8,10 @@ export const productPostSchema = object({
   description: optional(
     pipe(
       string(),
-      minLength(10, 'La descripción debe tener al menos 10 caracteres.')
+      check((value) => {
+        const trimmed = value.trim();
+        return trimmed === "" || trimmed.length >= 10;
+      }, "La descripción debe tener al menos 10 caracteres o estar vacía.")
     )
   ),
   price: pipe(
@@ -17,7 +20,7 @@ export const productPostSchema = object({
   ),
   stock: pipe(
     number(),
-    minValue(-1, 'El stock debe ser mayor a 0.')
+    minValue(0, 'El stock debe ser mayor a 0.')
   ),
   picture: optional(string()),
   active: boolean()
@@ -33,7 +36,10 @@ export const productUpdateSchema = object({
   description: optional(
     pipe(
       string(),
-      minLength(10, 'La descripción debe tener al menos 10 caracteres.')
+      check((value) => {
+        const trimmed = value.trim();
+        return trimmed === "" || trimmed.length >= 10;
+      }, "La descripción debe tener al menos 10 caracteres o estar vacía.")
     )
   ),
   price: optional(
@@ -45,7 +51,7 @@ export const productUpdateSchema = object({
   stock: optional(
     pipe(
       number(),
-      minValue(-1, 'El stock debe ser mayor a 0.')
+      minValue(0, 'El stock debe ser mayor a 0.')
     )
   ),
   picture: optional(string()),

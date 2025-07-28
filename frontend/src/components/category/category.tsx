@@ -5,14 +5,13 @@ import { Section } from "../section/section";
 import { Table, type Column } from "../table/table";
 import "./category.css";
 import type { Category, CategoryRequest, ParsedCategory } from "./models";
-import { parseCategoryData } from "./utils";
+import { parseCategoryData, parseCategoryDataForBackend } from "./utils";
 import { useApi } from "../../hooks";
 import type { SubmitHandler } from "react-hook-form";
 import { FormCategory } from "./components/formCategory";
 import { ModalEdit } from "../modal/modalEdit";
 import { useState } from "react";
 import { ModalDelete } from "../modal/modalDelete";
-// import { ModalDelete } from "../modal/modalDelete";
 
 const columns: Column<ParsedCategory>[] = [
   { header: "ID", accessor: "category_id" },
@@ -30,7 +29,7 @@ export const Categories = () => {
     autoFetch: true
   });
 
-  const { trigger, loading: apiLoading, error: apiError } = useApi<CategoryRequest>({
+  const { trigger: triggerPost, loading: apiLoading, error: apiError } = useApi<CategoryRequest>({
     url: "http://localhost:3000/api/v1/categories",
     method: "POST"
   });
@@ -58,18 +57,18 @@ export const Categories = () => {
   const handleData: ParsedCategory[] = parseCategoryData(categories);
 
   const onSubmit: SubmitHandler<CategoryRequest> = async (formData: CategoryRequest) => {
-    const productData: Partial<CategoryRequest> = {};
-    if (formData.name) productData.name = formData.name;
-    if (formData.description && formData.description.trim().length >= 10) productData.description = formData.description.trim();
+    const categoryData = parseCategoryDataForBackend(formData);
 
-    await trigger(productData as CategoryRequest);
+    await triggerPost(categoryData as CategoryRequest);
   };
 
   const onEdit = (row: ParsedCategory) => {
     setDataEditCategory(row);
   }
 
-  const onEditSubmit: SubmitHandler<CategoryRequest> = async (categoryData: CategoryRequest) => {
+  const onEditSubmit: SubmitHandler<CategoryRequest> = async (formData: CategoryRequest) => {
+    const categoryData = parseCategoryDataForBackend(formData);
+
     await triggerEdit(categoryData as CategoryRequest);
   }
 
@@ -83,18 +82,40 @@ export const Categories = () => {
 
   return (
     <>
-      <Section title="Categorías" description="Gestiona la carga, modificación y eliminación de las categorías de los productos.">
-        <Button label="Crear categoría" parentMethod={() => { }} dataBsToggle="modal" dataBsTarget="#createCategoryModal" />
+      <Section
+        title="Categorías"
+        description="Gestiona la carga, modificación y eliminación de las categorías de los productos.">
+
+        <Button
+          label="Crear categoría"
+          parentMethod={() => { }}
+          dataBsToggle="modal"
+          dataBsTarget="#createCategoryModal" />
+
         <div className="table-container">
           {categories.length > 0 ? (
-            <Table columns={columns} data={handleData} classNameEspecificTable="table-categories" dataBsToggle="modal" dataBsTargetEdit="#editCategoryModal" dataBsTargetDelete="#deleteCategoryModal" onEdit={onEdit} onDelete={onDelete} />
+            <Table
+              columns={columns}
+              data={handleData}
+              classNameEspecificTable="table-categories"
+              dataBsToggle="modal"
+              dataBsTargetEdit="#editCategoryModal"
+              dataBsTargetDelete="#deleteCategoryModal"
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
           ) : (
             <Loading className="table-container-loading" />
           )}
         </div>
       </Section>
 
-      <ModalPost id="createCategoryModal" title="Crear categoría" formId="createCategoryForm" loading={apiLoading}>
+      <ModalPost
+        id="createCategoryModal"
+        title="Crear categoría"
+        formId="createCategoryForm"
+        loading={apiLoading}>
+
         <FormCategory
           idModal="createCategoryModal"
           formId="createCategoryForm"
@@ -103,9 +124,15 @@ export const Categories = () => {
           apiError={apiError}
           mode="create"
         />
+
       </ModalPost>
 
-      <ModalEdit id="editCategoryModal" title="Editar categoría" formId="editCategoryForm" loading={apiEditLoading}>
+      <ModalEdit
+        id="editCategoryModal"
+        title="Editar categoría"
+        formId="editCategoryForm"
+        loading={apiEditLoading}>
+
         <FormCategory
           idModal="editCategoryModal"
           formId="editCategoryForm"
@@ -118,9 +145,15 @@ export const Categories = () => {
             description: dataEditCategory.description
           } : undefined}
         />
+
       </ModalEdit>
 
-      <ModalDelete id="deleteCategoryModal" title="Eliminar categoría" loading={apiDeleteLoading} onDelete={onDeleteSubmit}>
+      <ModalDelete
+        id="deleteCategoryModal"
+        title="Eliminar categoría"
+        loading={apiDeleteLoading}
+        onDelete={onDeleteSubmit}>
+
         <FormCategory
           idModal="deleteCategoryModal"
           formId="deleteCategoryForm"
@@ -133,6 +166,7 @@ export const Categories = () => {
             description: dataDeleteCategory.description
           } : undefined}
         />
+
       </ModalDelete>
     </>
   );

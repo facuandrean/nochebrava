@@ -8,7 +8,10 @@ export const categoryPostSchema = object({
   description: optional(
     pipe(
       string(),
-      minLength(3, "La descripción de la categoría debe tener al menos 3 caracteres.")
+      check((value) => {
+        const trimmed = value.trim();
+        return trimmed === "" || trimmed.length >= 3;
+      }, "La descripción debe tener al menos 3 caracteres o estar vacía.")
     )
   )
 });
