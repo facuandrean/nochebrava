@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { AppError } from '../errors';
 import { productCategoryService } from '../services/productCategoryService';
-import type { Category, Product, ProductCategoryBodyPost, ProductCategoryBodyUpdate, UUIDInput } from '../types/types';
+import type { Category, Product, ProductCategoryBodyPost, ProductCategoryBodyUpdate, ProductCategoriesBatchBodyPost, ProductCategoriesBatchBodyPut, UUIDInput } from '../types/types';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
 
@@ -364,10 +364,157 @@ const unassignCategoryFromProduct = async (req: Request, res: Response): Promise
   }
 }
 
+/**
+ * Assigns multiple categories to a product in the database.
+ * 
+ * @description This function creates multiple relationships between a product and categories
+ * through the product-category service. First validates that the product exists and all 
+ * categories exist, then establishes all the relationships in a single operation.
+ * 
+ * @param {Request} req - Express request object that must contain product_id and category_ids array in the body
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>} No return value, sends HTTP response directly
+ * 
+ * @throws {AppError} When the product is not found
+ * @throws {AppError} When any category is not found
+ * @throws {AppError} When a specific application error occurs
+ * @throws {Error} When an internal server error occurs
+ */
+const assignMultipleCategoriesToProduct = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { product_id, category_ids } = req.body as ProductCategoriesBatchBodyPost;
+
+    // Validate product exists
+    const product: Product | undefined = await productService.getProductById(product_id);
+    if (!product) {
+      res.status(404).json({
+        status: "Operación fallida.",
+        message: "Producto no encontrado.",
+        data: []
+      });
+      return;
+    }
+
+    // Validate all categories exist
+    for (const category_id of category_ids) {
+      const category: Category | undefined = await categoryService.getCategoryById(category_id);
+      if (!category) {
+        res.status(404).json({
+          status: "Operación fallida.",
+          message: `Categoría ${category_id} no encontrada.`,
+          data: []
+        });
+        return;
+      }
+    }
+
+    await productCategoryService.assignMultipleCategoriesToProduct(product_id, category_ids);
+
+    res.status(200).json({
+      status: "Operación exitosa.",
+      message: `${category_ids.length} categorías asignadas al producto correctamente.`,
+      data: []
+    });
+    return;
+
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.status).json({
+        status: "Operación fallida.",
+        message: error.message,
+        data: error.data
+      });
+      return;
+    }
+
+    res.status(500).json({
+      status: "Operación fallida.",
+      message: "Error interno del servidor.",
+      data: []
+    });
+    return;
+  }
+}
+
+/**
+ * Replaces all categories of a product with new ones.
+ * 
+ * @description This function completely replaces all existing category assignments 
+ * for a product with a new set of categories. First validates that the product exists 
+ * and all new categories exist, then replaces all relationships in a single operation.
+ * 
+ * @param {Request} req - Express request object that must contain product_id in parameters and category_ids array in the body
+ * @param {Response} res - Express response object
+ * @returns {Promise<void>} No return value, sends HTTP response directly
+ * 
+ * @throws {AppError} When the product is not found
+ * @throws {AppError} When any category is not found
+ * @throws {AppError} When a specific application error occurs
+ * @throws {Error} When an internal server error occurs
+ */
+const replaceProductCategories = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { product_id } = req.params as UUIDInput;
+    const { category_ids } = req.body as ProductCategoriesBatchBodyPut;
+
+    // Validate product exists
+    const product: Product | undefined = await productService.getProductById(product_id);
+    if (!product) {
+      res.status(404).json({
+        status: "Operación fallida.",
+        message: "Producto no encontrado.",
+        data: []
+      });
+      return;
+    }
+
+    // Validate all categories exist
+    for (const category_id of category_ids) {
+      const category: Category | undefined = await categoryService.getCategoryById(category_id);
+      if (!category) {
+        res.status(404).json({
+          status: "Operación fallida.",
+          message: `Categoría ${category_id} no encontrada.`,
+          data: []
+        });
+        return;
+      }
+    }
+
+    await productCategoryService.replaceProductCategories(product_id, category_ids);
+
+    res.status(200).json({
+      status: "Operación exitosa.",
+      message: `Categorías del producto reemplazadas correctamente. ${category_ids.length} categorías asignadas.`,
+      data: []
+    });
+    return;
+
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.status).json({
+        status: "Operación fallida.",
+        message: error.message,
+        data: error.data
+      });
+      return;
+    }
+
+    res.status(500).json({
+      status: "Operación fallida.",
+      message: "Error interno del servidor.",
+      data: []
+    });
+    return;
+  }
+}
+
 export const productCategoryController = {
   getProductsByCategory,
   getCategoriesByProduct,
   assignCategoryToProduct,
   updateProductCategory,
-  unassignCategoryFromProduct
+  unassignCategoryFromProduct,
+  assignMultipleCategoriesToProduct,
+  replaceProductCategories
 };

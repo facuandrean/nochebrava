@@ -1,4 +1,4 @@
-import { object, optional, string, pipe, custom } from "valibot";
+import { object, optional, string, pipe, custom, array } from "valibot";
 import { isUUID } from '../utils/uuid';
 
 export const productCategoryPostSchema = object({
@@ -26,3 +26,26 @@ export const productCategoryUpdateSchema = object({
     )
   )
 })
+
+// Nuevos schemas para operaciones batch
+export const productCategoriesBatchPostSchema = object({
+  product_id: pipe(
+    string(),
+    custom((input) => isUUID(input as string), 'Formato de ID de producto inválido')
+  ),
+  category_ids: array(
+    pipe(
+      string(),
+      custom((input) => isUUID(input as string), 'Formato de ID de categoría inválido')
+    )
+  )
+});
+
+export const productCategoriesBatchPutSchema = object({
+  category_ids: array(
+    pipe(
+      string(),
+      custom((input) => isUUID(input as string), 'Formato de ID de categoría inválido')
+    )
+  )
+});

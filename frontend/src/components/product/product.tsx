@@ -175,7 +175,7 @@ export const Products = () => {
             description: dataEditProduct.description,
             price: dataEditProduct.price,
             stock: dataEditProduct.stock,
-            active: dataEditProduct.active === "false"
+            active: dataEditProduct.active === "No" ? false : true
           } : undefined}
         />
       </ModalEdit>
@@ -198,7 +198,7 @@ export const Products = () => {
             description: dataDeleteProduct.description,
             price: dataDeleteProduct.price,
             stock: dataDeleteProduct.stock,
-            active: dataDeleteProduct.active === "true"
+            active: dataDeleteProduct.active === "No" ? false : true
           } : undefined}
         />
 

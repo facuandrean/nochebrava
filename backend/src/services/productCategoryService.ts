@@ -152,10 +152,71 @@ const unassignCategoryFromProduct = async (productId: UUIDInput, categoryId: UUI
   }
 }
 
+/**
+ * Assigns multiple categories to a product in the database.
+ * 
+ * @description This function creates multiple relationships between a product and categories
+ * in the productCategories table. This establishes that a product belongs to multiple categories.
+ * It processes all category assignments in a single transaction for consistency.
+ * 
+ * @param {string} productId - The ID of the product to assign the categories to
+ * @param {string[]} categoryIds - Array of category IDs to assign to the product
+ * @returns {Promise<void>} Promise that resolves when all assignments are complete
+ * 
+ * @throws {AppError} When a database error occurs during the insertion
+ */
+const assignMultipleCategoriesToProduct = async (productId: UUIDInput, categoryIds: UUIDInput[]): Promise<void> => {
+  try {
+    const values = categoryIds.map(categoryId => ({
+      product_id: productId,
+      category_id: categoryId
+    }));
+
+    await db.insert(productCategories).values(values);
+  } catch (error) {
+    throw new AppError('Error al asignar múltiples categorías al producto', 400, []);
+  }
+}
+
+/**
+ * Replaces all categories of a product with new ones.
+ * 
+ * @description This function completely replaces all existing category assignments 
+ * for a product with a new set of categories. It first removes all existing 
+ * relationships and then inserts the new ones. This operation is performed
+ * in a transaction to ensure data consistency.
+ * 
+ * @param {string} productId - The ID of the product to update categories for
+ * @param {string[]} categoryIds - Array of new category IDs to assign to the product
+ * @returns {Promise<void>} Promise that resolves when the replacement is complete
+ * 
+ * @throws {AppError} When a database error occurs during the operation
+ */
+const replaceProductCategories = async (productId: UUIDInput, categoryIds: UUIDInput[]): Promise<void> => {
+  try {
+    // Remove all existing categories for this product
+    await db.delete(productCategories).where(eq(productCategories.product_id, productId));
+
+    // Insert new categories if any provided
+    if (categoryIds.length > 0) {
+      const values = categoryIds.map(categoryId => ({
+        product_id: productId,
+        category_id: categoryId
+      }));
+
+      await db.insert(productCategories).values(values);
+    }
+  } catch (error) {
+    throw new AppError('Error al reemplazar las categorías del producto', 400, []);
+  }
+}
+
 export const productCategoryService = {
   getProductsByCategory,
   getCategoriesByProduct,
   assignCategoryToProduct,
   updateProductCategory,
-  unassignCategoryFromProduct
+  unassignCategoryFromProduct,
+  assignMultipleCategoriesToProduct,
+  replaceProductCategories
 }

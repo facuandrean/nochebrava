@@ -7,7 +7,7 @@ import type { categories } from '../database/db/categoryScheme';
 import type { productPostSchema, productUpdateSchema } from "../schemas/productSchema";
 import type { categoryPostSchema, categoryUpdateSchema } from '../schemas/categorySchema';
 import type { productCategories } from '../database/db/productCategoryScheme';
-import type { productCategoryPostSchema, productCategoryUpdateSchema } from '../schemas/productCategorySchema';
+import type { productCategoryPostSchema, productCategoryUpdateSchema, productCategoriesBatchPostSchema, productCategoriesBatchPutSchema } from '../schemas/productCategorySchema';
 import type { orderPostSchema } from '../schemas/orderSchema';
 import type { detailOrderPostSchema, detailOrderUpdateSchema } from '../schemas/detailOrderSchema';
 import type { detailOrders } from '../database/db/detailOrderScheme';
@@ -40,6 +40,8 @@ export type CategoryBodyUpdate = Input<typeof categoryUpdateSchema>;
 export type ProductCategory = InferModel<typeof productCategories>;
 export type ProductCategoryBodyPost = Input<typeof productCategoryPostSchema>;
 export type ProductCategoryBodyUpdate = Input<typeof productCategoryUpdateSchema>;
+export type ProductCategoriesBatchBodyPost = Input<typeof productCategoriesBatchPostSchema>;
+export type ProductCategoriesBatchBodyPut = Input<typeof productCategoriesBatchPutSchema>;
 
 export type Order = InferModel<typeof orders>;
 export type OrderWithoutId = Omit<Order, "order_id">;
