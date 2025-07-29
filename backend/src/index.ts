@@ -13,11 +13,12 @@ import paymentMethodRouter from "./v1/routes/paymentMethodRoutes";
 import itemTypeRouter from "./v1/routes/itemTypeRoutes";
 import expenseRouter from "./v1/routes/expenseRoutes";
 import expenseItemRouter from "./v1/routes/expenseItemRoutes";
+import { corsOptions } from "./middlewares/cors";
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
