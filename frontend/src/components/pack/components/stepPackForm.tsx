@@ -1,47 +1,46 @@
 import type { SubmitHandler } from "react-hook-form";
-import type { ProductRequest } from "../models/product.model";
+import { InputForm } from "../../form/components/genericInput";
+import { GenericForm } from "../../form/genericForm";
+import type { PackRequest } from "../models";
 import { validateDescription } from "../../../utils";
-import { GenericForm } from "../../form";
-import { InputForm } from "../../form/components";
 
-const defaultValues: ProductRequest = {
+const defaultValues: PackRequest = {
   name: "",
   description: "",
   price: 0,
-  stock: 0,
   active: true
 };
 
-interface FormProductProps {
+interface StepPackInfoProps {
   idModal: string;
   formId: string;
-  onSubmit: SubmitHandler<ProductRequest>;
+  onNextStep: SubmitHandler<PackRequest>;
   apiLoading: boolean;
   apiError: Error | null;
   mode: "create" | "edit" | "delete";
-  initialValues?: ProductRequest;
+  initialValues?: PackRequest;
 }
 
-export const FormProduct = ({ idModal, formId, onSubmit, apiLoading, apiError, mode, initialValues }: FormProductProps) => {
+export const StepPackForm = ({ idModal, formId, onNextStep, apiLoading, apiError, mode, initialValues }: StepPackInfoProps) => {
   return (
-    <GenericForm<ProductRequest>
+    <GenericForm<PackRequest>
       idModal={idModal}
       formId={formId}
       defaultValues={initialValues || defaultValues}
-      onSubmit={onSubmit}
+      onSubmit={onNextStep}
       loading={apiLoading}
       error={apiError}
     >
       {({ control, errors }) => (
         mode === "delete" ? (
           <div>
-            <p>¿Estás seguro de querer eliminar el producto <strong>"{initialValues?.name}"</strong>?</p>
+            <p>¿Estás seguro de querer eliminar el pack <strong>"{initialValues?.name}"</strong>?</p>
           </div>
         ) : (
           <>
             <InputForm
               name="name"
-              label="Nombre del producto"
+              label="Nombre del pack"
               control={control}
               errors={errors}
               type="text"
@@ -78,29 +77,16 @@ export const FormProduct = ({ idModal, formId, onSubmit, apiLoading, apiError, m
               }}
             />
             <InputForm
-              name="stock"
-              label="Stock"
-              control={control}
-              errors={errors}
-              type="number"
-              rules={{
-                required: "El stock es obligatorio",
-                min: {
-                  value: 0,
-                  message: "El stock debe ser mayor o igual a 0."
-                }
-              }}
-            />
-            <InputForm
               name="active"
               label="Activo"
               control={control}
               errors={errors}
               type="checkbox"
             />
+            <span className="note text-muted">* Podes dejar el <strong>precio</strong> en 0 momentáneamente, y luego de agregar los productos y ver un precio estimativo, podes volver para ponerle un precio real.</span>
           </>
         )
       )}
     </GenericForm>
-  )
+  );
 }

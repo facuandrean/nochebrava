@@ -166,56 +166,64 @@ const getPackItemsByPackId = async (req: Request, res: Response): Promise<void> 
 };
 
 /**
- * Crea un nuevo pack item o actualiza la cantidad si ya existe.
+ * Crea uno o múltiples pack items o actualiza las cantidades si ya existen.
  * 
- * @description Endpoint que crea un nuevo pack item o actualiza la cantidad si el producto ya existe en el pack.
+ * @description Endpoint que puede crear un pack item individual o múltiples pack items en lote.
  * Si viene desde una ruta compuesta, usa el pack_id de la URL.
- * Verifica si ya existe un item con el mismo producto en el pack antes de crear o actualizar.
+ * Para cada item, verifica si ya existe un item con el mismo producto en el pack antes de crear o actualizar.
  * 
- * @param {Request} req - Objeto de solicitud Express con datos del pack item en body y opcionalmente pack_id en params
+ * @param {Request} req - Objeto de solicitud Express con datos del pack item(s) en body y opcionalmente pack_id en params
  * @param {Response} res - Objeto de respuesta Express
  * @returns {Promise<void>} No retorna valor, envía respuesta HTTP
  */
 const postPackItem = async (req: Request, res: Response): Promise<void> => {
   try {
-    const dataPackItem = req.body as PackItemBodyPost;
+    const requestBody = req.body as PackItemBodyPost;
 
-    // Si viene desde una ruta compuesta, usar el pack_id de la URL
-    if (req.params.pack_id) {
-      dataPackItem.pack_id = req.params.pack_id;
+    if (requestBody.length === 0) {
+      res.status(400).json({
+        status: "Operación fallida.",
+        message: "No se proporcionaron items de pack.",
+        data: []
+      });
+      return;
     }
 
-    // Verificar si ya existe un item con el mismo producto en este pack
-    const existingItem = await packItemService.getPackItemByPackAndProduct(
-      dataPackItem.pack_id,
-      dataPackItem.product_id
-    );
+    // Verificar si es un array o un objeto único
+    const isArray = Array.isArray(requestBody);
+    const packItemsData = isArray ? requestBody : [requestBody];
 
-    let result: PackItem;
-
-    if (existingItem) {
-      // Actualizar cantidad del item existente
-      const newQuantity = existingItem.quantity + dataPackItem.quantity;
-
-      result = await packItemService.updatePackItem(existingItem.pack_item_id, {
-        quantity: newQuantity
+    const existsPack = await packService.getPackById(requestBody[0].pack_id);
+    if (!existsPack) {
+      res.status(404).json({
+        status: "Operación fallida.",
+        message: "No se encontró el pack.",
+        data: []
       });
-
-      res.status(200).json({
-        status: "Operación exitosa.",
-        message: "Cantidad del item de pack actualizada correctamente.",
-        data: result
-      });
-    } else {
-      // Crear nuevo item
-      result = await packItemService.postPackItem(dataPackItem);
-
-      res.status(201).json({
-        status: "Operación exitosa.",
-        message: "Item de pack creado correctamente.",
-        data: result
-      });
+      return;
     }
+
+    const results: PackItem[] = [];
+    const messages: string[] = [];
+
+    // Procesar cada pack item
+    for (const dataPackItem of packItemsData) {
+      const result: PackItem = await packItemService.postPackItem(dataPackItem);
+      messages.push(`Item creado para producto ${dataPackItem.product_id}`);
+
+      results.push(result);
+    }
+
+    // Respuesta consistente: siempre devolver un array
+    const message = isArray
+      ? `${results.length} items de pack procesados correctamente. ${messages.join('. ')}`
+      : messages[0] || "Item de pack procesado correctamente.";
+
+    res.status(201).json({
+      status: "Operación exitosa.",
+      message,
+      data: results
+    });
     return;
 
   } catch (error) {

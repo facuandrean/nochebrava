@@ -8,11 +8,11 @@ import type { Category, CategoryRequest, ParsedCategory } from "./models";
 import { parseCategoryData, parseCategoryDataForBackend } from "./utils";
 import { useApi } from "../../hooks";
 import type { SubmitHandler } from "react-hook-form";
-import { FormCategory } from "./components/formCategory";
 import { ModalEdit } from "../modal/modalEdit";
 import { useEffect, useState } from "react";
 import { ModalDelete } from "../modal/modalDelete";
-import { Filter } from "../filter/filter";
+import { Filter } from "../filter";
+import { FormCategory } from "./components";
 
 const columns: Column<ParsedCategory>[] = [
   { header: "N°", accessor: "category_id" },

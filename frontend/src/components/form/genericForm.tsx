@@ -72,7 +72,6 @@ export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultVal
 
       return () => {
         modal.removeEventListener('hidden.bs.modal', handleHidden);
-
       };
     }
   }, [reset, idModal]);

@@ -1,18 +1,25 @@
 import "./modal.css";
 
 interface ModalPostProps {
+  // Estas propiedades son para el modal.
   id: string;
   title: string;
-  children: React.ReactNode;
   formId: string; // ID del formulario al que se conectarán los botones
-  loading?: boolean; // Para deshabilitar botones mientras se envía
+  loading: boolean;
+  children: React.ReactNode;
+
+  // Estas propiedades son para wizards.
+  step?: number;
+  onCancel?: () => void;
+  onSubmit?: () => void;
+  onFinish?: () => void;
 }
 
-export const ModalPost = ({ id, title, children, formId, loading = false }: ModalPostProps) => {
+export const ModalPost = ({ id, title, formId, loading = false, children, step, onCancel, onSubmit, onFinish }: ModalPostProps) => {
   return (
     <>
       <div className="modal fade" id={id} aria-hidden="true" aria-labelledby={`${id}Label`} tabIndex={-1}>
-        <div className="modal-dialog modal-dialog-centered">
+        <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id={`${id}Label`}>{title}</h5>
@@ -22,11 +29,23 @@ export const ModalPost = ({ id, title, children, formId, loading = false }: Moda
               {children}
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" disabled={loading}>
+              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" disabled={loading} onClick={onCancel}>
                 Cancelar
               </button>
-              <button type="submit" form={formId} className="btn btn-success" disabled={loading}>
-                {loading ? "Guardando..." : "Guardar"}
+              <button
+                type="submit"
+                form={formId}
+                className="btn btn-success"
+                disabled={loading}
+                onClick={() => {
+                  if (step === 1) {
+                    onSubmit?.();
+                  } else {
+                    onFinish?.();
+                  }
+                }}
+              >
+                {loading ? "Guardando..." : (step === 1 ? "Guardar" : "Finalizar")}
               </button>
             </div>
           </div>

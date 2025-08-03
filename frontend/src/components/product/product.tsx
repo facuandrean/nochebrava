@@ -13,7 +13,7 @@ import { ModalEdit } from "../modal/modalEdit";
 import { FormProduct } from "./components/formProduct";
 import { useEffect, useState } from "react";
 import { ModalDelete } from "../modal/modalDelete";
-import { Filter } from "../filter/filter";
+import { Filter } from "../filter";
 
 const columns: Column<ParsedProduct>[] = [
   { header: "N°", accessor: "product_id" },

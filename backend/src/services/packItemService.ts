@@ -76,7 +76,12 @@ const getPackItemsByPackId = async (pack_id: string): Promise<PackItem[]> => {
 const getPackItemByPackAndProduct = async (pack_id: string, product_id: string): Promise<PackItem | undefined> => {
   try {
     const packItem: PackItem | undefined = await db.select().from(packItems)
-      .where(and(eq(packItems.pack_id, pack_id), eq(packItems.product_id, product_id)))
+      .where(
+        and(
+          eq(packItems.pack_id, pack_id),
+          eq(packItems.product_id, product_id)
+        )
+      )
       .get();
     return packItem;
   } catch (error) {
@@ -113,7 +118,9 @@ const postPackItem = async (dataPackItem: PackItemBodyPost): Promise<PackItem> =
     // Create new pack item
     const newPackItem = {
       pack_item_id: uuid(),
-      ...dataPackItem
+      ...dataPackItem,
+      created_at: getCurrentDate(),
+      updated_at: getCurrentDate()
     };
 
     const packItem: PackItem = await db.insert(packItems).values(newPackItem).returning().get();

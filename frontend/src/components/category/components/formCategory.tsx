@@ -1,7 +1,7 @@
 import type { SubmitHandler } from "react-hook-form";
-import { GenericForm } from "../../form/genericForm";
 import type { CategoryRequest } from "../models";
-import { InputForm } from "../../form/components/genericInput";
+import { GenericForm } from "../../form";
+import { InputForm } from "../../form/components";
 
 const defaultValues: CategoryRequest = {
   name: "",

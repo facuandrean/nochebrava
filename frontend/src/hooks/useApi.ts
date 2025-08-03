@@ -1,27 +1,35 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 type Data<T> = T | null;
 type ErrorType = Error | null;
 
-interface ApiRequestParams<T> {
+interface ApiRequestParams<TRequest> {
   id?: string;
   url: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  body?: T;
+  body?: TRequest;
   headers?: Record<string, string>;
   autoFetch?: boolean;
 }
 
-export const useApi = <T>({ id, url, method, headers, autoFetch = false }: ApiRequestParams<T>) => {
-  const [data, setData] = useState<Data<T>>(null);
+export const useApi = <TRequest = unknown, TResponse = TRequest>({ id, url, method, headers, autoFetch = false }: ApiRequestParams<TRequest>) => {
+  const [data, setData] = useState<Data<TResponse>>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<ErrorType>(null);
+  const controllerRef = useRef<AbortController | null>(null);
 
-  const trigger = async (body?: T) => {
+  const trigger = async (body?: TRequest) => {
 
     if (!url) return;
 
+    // Cancelar petición anterior si existe
+    if (controllerRef.current) {
+      controllerRef.current.abort();
+    }
+
+    // Crear nuevo controller para esta petición
     const controller = new AbortController();
+    controllerRef.current = controller;
 
     setLoading(true);
 
@@ -36,7 +44,7 @@ export const useApi = <T>({ id, url, method, headers, autoFetch = false }: ApiRe
         signal: controller.signal
       })
 
-      const jsonData: T = await response.json();
+      const jsonData: TResponse = await response.json();
 
       if (!response.ok) {
         const backendMessage = (jsonData as unknown as { message: string })?.message;
@@ -46,6 +54,8 @@ export const useApi = <T>({ id, url, method, headers, autoFetch = false }: ApiRe
 
       setData(jsonData);
       setError(null);
+
+      return jsonData;
     } catch (error) {
       if (error instanceof Error && error.name !== 'AbortError') {
         setError(error);
@@ -53,15 +63,23 @@ export const useApi = <T>({ id, url, method, headers, autoFetch = false }: ApiRe
     } finally {
       setLoading(false);
     }
-
-    return () => controller.abort();
   }
 
   useEffect(() => {
     if (autoFetch && method === 'GET') {
       trigger();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url, method, autoFetch]);
+
+  // Cleanup: cancelar petición pendiente cuando el componente se desmonte
+  useEffect(() => {
+    return () => {
+      if (controllerRef.current) {
+        controllerRef.current.abort();
+      }
+    };
+  }, []);
 
   return { data, loading, error, trigger };
 }; 

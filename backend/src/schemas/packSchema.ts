@@ -1,13 +1,18 @@
-import { boolean, minLength, minValue, number, object, optional, pipe, string } from "valibot";
+import { boolean, check, minLength, minValue, number, object, optional, pipe, string } from "valibot";
 
 export const packPostSchema = object({
   name: pipe(
     string(),
     minLength(3, "El nombre del pack debe tener al menos 3 caracteres"),
   ),
-  description: pipe(
-    string(),
-    minLength(3, "La descripción del pack debe tener al menos 3 caracteres"),
+  description: optional(
+    pipe(
+      string(),
+      check((value) => {
+        const trimmed = value.trim();
+        return trimmed === "" || trimmed.length >= 10;
+      }, "La descripción debe tener al menos 10 caracteres o estar vacía.")
+    )
   ),
   price: pipe(
     number(),
@@ -30,7 +35,10 @@ export const packUpdateSchema = object({
   description: optional(
     pipe(
       string(),
-      minLength(3, "La descripción del pack debe tener al menos 3 caracteres"),
+      check((value) => {
+        const trimmed = value.trim();
+        return trimmed === "" || trimmed.length >= 10;
+      }, "La descripción debe tener al menos 10 caracteres o estar vacía.")
     )
   ),
   price: optional(

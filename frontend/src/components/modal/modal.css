@@ -2,6 +2,11 @@
   min-width: 375px;
 }
 
+.modal-body {
+  max-width: 800px;
+  /* overflow-x: hidden; */
+}
+
 .modal-body p {
   margin-bottom: 0;
 }
