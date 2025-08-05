@@ -4,7 +4,7 @@ import { Loading } from "../loading/loading";
 
 interface GenericFormProps<T extends FieldValues> {
   idModal: string;
-  formId: string; // Nuevo prop para el ID del formulario
+  formId: string;
   defaultValues: T;
   onSubmit: SubmitHandler<T>;
   loading?: boolean;

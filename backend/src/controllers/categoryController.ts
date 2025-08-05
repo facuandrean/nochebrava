@@ -23,7 +23,7 @@ const getCategories = async (_req: Request, res: Response): Promise<void> => {
 
     if (categories.length === 0) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontraron categorías.",
         data: []
       });
@@ -78,7 +78,7 @@ const getCategoryById = async (req: Request, res: Response): Promise<void> => {
 
     if (!category) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontró la categoría.",
         data: []
       });
@@ -180,7 +180,7 @@ const patchCategory = async (req: Request, res: Response): Promise<void> => {
 
     if (!oldDataCategory) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontró la categoría.",
         data: []
       });
@@ -237,7 +237,7 @@ const deleteCategory = async (req: Request, res: Response): Promise<void> => {
 
     if (!category) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontró la categoría.",
         data: []
       });

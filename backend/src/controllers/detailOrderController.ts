@@ -10,7 +10,7 @@ const getDetailOrders = async (_req: Request, res: Response): Promise<void> => {
 
     if (detailOrders.length === 0) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontraron detalles de ordenes.",
         data: []
       });
@@ -37,6 +37,7 @@ const getDetailOrders = async (_req: Request, res: Response): Promise<void> => {
     res.status(500).json({
       status: "Operación fallida",
       message: "Ocurrió un error al obtener los detalles de ordenes.",
+      data: []
     });
     return;
   }
@@ -49,7 +50,7 @@ const getDetailOrdersById = async (req: Request, res: Response): Promise<void> =
 
     if (!detailOrder) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontró el detalle de orden.",
         data: []
       });
@@ -76,6 +77,7 @@ const getDetailOrdersById = async (req: Request, res: Response): Promise<void> =
     res.status(500).json({
       status: "Operación fallida",
       message: "Ocurrió un error al obtener el detalle de orden.",
+      data: []
     });
     return;
   }
@@ -87,8 +89,8 @@ const postDetailOrder = async (req: Request, res: Response): Promise<void> => {
 
     const isValidItemType = await validateItemType(dataDetailOrder.item_type);
     if (!isValidItemType) {
-      res.status(400).json({
-        status: "Operación fallida",
+      res.status(404).json({
+        status: "Operación exitosa.",
         message: "El tipo de item especificado no existe.",
         data: []
       });
@@ -98,8 +100,8 @@ const postDetailOrder = async (req: Request, res: Response): Promise<void> => {
     // Validar que el item existe (producto o pack)
     const isValidItem = await validateItemExists(dataDetailOrder.item_id, dataDetailOrder.item_type);
     if (!isValidItem) {
-      res.status(400).json({
-        status: "Operación fallida",
+      res.status(404).json({
+        status: "Operación exitosa.",
         message: "El item especificado no existe para el tipo dado.",
         data: []
       });
@@ -115,7 +117,7 @@ const postDetailOrder = async (req: Request, res: Response): Promise<void> => {
 
     if (!stockUpdated) {
       res.status(400).json({
-        status: "Operación fallida",
+        status: "Operación fallida.",
         message: "No hay suficiente stock disponible para completar la venta.",
         data: []
       });
@@ -158,7 +160,7 @@ const deleteDetailOrder = async (req: Request, res: Response): Promise<void> => 
 
     if (!detailOrder) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontró el detalle de orden.",
         data: []
       });
@@ -200,7 +202,7 @@ const getDetailOrderWithItemInfo = async (req: Request, res: Response): Promise<
 
     if (!detailOrder) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontró el detalle de orden.",
         data: []
       });
@@ -250,7 +252,7 @@ const getDetailOrdersByOrderId = async (req: Request, res: Response): Promise<vo
 
     if (detailOrdersList.length === 0) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontraron detalles para esta orden.",
         data: []
       });

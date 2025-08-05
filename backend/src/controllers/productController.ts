@@ -23,7 +23,7 @@ const getProducts = async (_req: Request, res: Response): Promise<void> => {
 
     if (products.length === 0) {
       res.status(404).json({
-        status: 'Operación fallida',
+        status: 'Operación exitosa.',
         message: 'No se han encontrado productos.',
         data: []
       });
@@ -78,7 +78,7 @@ const getProductById = async (req: Request, res: Response): Promise<void> => {
 
     if (!product) {
       res.status(404).json({
-        status: 'Operación fallida',
+        status: 'Operación exitosa.',
         message: 'No se ha encontrado el producto de id: ' + id_product,
         data: []
       });
@@ -182,7 +182,7 @@ const patchProduct = async (req: Request, res: Response): Promise<void> => {
 
     if (!oldProductData) {
       res.status(404).json({
-        status: 'Operación fallida',
+        status: 'Operación exitosa.',
         message: 'No se ha encontrado el producto de id: ' + id_product,
         data: []
       });
@@ -239,7 +239,7 @@ const deleteProduct = async (req: Request, res: Response): Promise<void> => {
 
     if (!product) {
       res.status(404).json({
-        status: 'Operación fallida',
+        status: 'Operación exitosa.',
         message: 'No se ha encontrado el producto de id: ' + id_product,
         data: []
       });

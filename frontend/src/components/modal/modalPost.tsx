@@ -45,7 +45,7 @@ export const ModalPost = ({ id, title, formId, loading = false, children, step, 
                   }
                 }}
               >
-                {loading ? "Guardando..." : (step === 1 ? "Guardar" : "Finalizar")}
+                {loading ? "Guardando..." : (step === 1 ? "Avanzar" : "Guardar")}
               </button>
             </div>
           </div>

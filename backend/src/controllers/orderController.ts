@@ -9,7 +9,7 @@ const getOrders = async (_req: Request, res: Response): Promise<void> => {
 
     if (orders.length === 0) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontraron ordenes.",
         data: []
       });
@@ -50,7 +50,7 @@ const getOrderById = async (req: Request, res: Response): Promise<void> => {
 
     if (!order) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontró la orden.",
         data: []
       });
@@ -123,7 +123,7 @@ const deleteOrder = async (req: Request, res: Response): Promise<void> => {
 
     if (!order) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontró la orden.",
         data: []
       });
@@ -166,7 +166,7 @@ const getOrderWithDetails = async (req: Request, res: Response): Promise<void> =
 
     if (!orderWithDetails) {
       res.status(404).json({
-        status: "Operación fallida",
+        status: "Operación exitosa.",
         message: "No se encontró la orden.",
         data: []
       });

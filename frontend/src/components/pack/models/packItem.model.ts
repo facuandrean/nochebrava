@@ -8,7 +8,7 @@ export interface PackItem {
   updated_at: string;
 }
 
-export interface PackItemResponse {
+export interface PackItemListResponse {
   data: PackItem[];
   status: string;
   message: string;

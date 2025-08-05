@@ -28,3 +28,15 @@ export interface ProductRequest {
   stock: number;
   active: boolean;
 }
+
+export interface ProductResponse {
+  data: Product;
+  status: string;
+  message: string;
+}
+
+export interface ProductListResponse {
+  data: Product[];
+  status: string;
+  message: string;
+}

@@ -1,4 +1,4 @@
-export type { Pack, ParsedPack, PackRequest } from './pack.model';
+export type { Pack, ParsedPack, PackRequest, PackResponse, PackListResponse } from './pack.model';
 export type { PackItem, ParsedPackItem, PackItemRequest, PackItemResponse } from './packItem.model';
 export type {
   ProductForSelection,

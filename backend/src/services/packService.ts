@@ -2,27 +2,85 @@ import { eq } from "drizzle-orm";
 import { db } from "../database/database";
 import { packs } from "../database/db/packScheme";
 import { AppError } from "../errors";
-import type { Pack, PackBodyPost, PackBodyUpdate } from "../types/types";
+import type { Pack, PackItem, PackBodyPost, PackBodyUpdate } from "../types/types";
 import { getCurrentDate } from "../utils/date";
 import { v4 as uuid } from "uuid";
+import { packItems } from "../database/db/packItemScheme";
+import { products } from "../database/db/productScheme";
 
 /**
- * Obtiene todos los packs del sistema.
+ * Obtiene todos los packs del sistema con sus packItems incluidos.
  * 
- * @description Recupera todos los packs almacenados en la base de datos.
- * Los packs representan agrupaciones de productos que se venden juntos.
+ * @description Recupera todos los packs almacenados en la base de datos junto con
+ * sus packItems correspondientes. Cada pack incluye un array de packItems que lo conforman.
  * 
- * @returns {Promise<Pack[]>} Array con todos los packs encontrados
+ * @returns {Promise<(Pack & { pack_items: PackItem[] })[]>} Array con todos los packs y sus packItems
  * @throws {AppError} Si ocurre un error al consultar la base de datos
  * 
  * @example
  * const allPacks = await getPacks();
- * console.log(allPacks); // [{ pack_id: "uuid", name: "Pack Premium", ... }]
+ * console.log(allPacks); // [{ pack_id: "uuid", name: "Pack Premium", pack_items: [...] }]
  */
-const getPacks = async (): Promise<Pack[]> => {
+const getPacks = async (): Promise<(Pack & { pack_items: PackItem[] })[]> => {
   try {
-    const allPacks: Pack[] = await db.select().from(packs).all();
-    return allPacks;
+    // Realizar la consulta con leftJoin para obtener packs y sus packItems
+    const results = await db.select({
+      // Campos del pack
+      pack_id: packs.pack_id,
+      name: packs.name,
+      description: packs.description,
+      price: packs.price,
+      active: packs.active,
+      picture: packs.picture,
+      created_at: packs.created_at,
+      updated_at: packs.updated_at,
+      // Campos del packItem (pueden ser null si no hay items)
+      pack_item_id: packItems.pack_item_id,
+      product_id: products.product_id,
+      product_name: products.name,
+      quantity: packItems.quantity,
+      item_created_at: packItems.created_at,
+      item_updated_at: packItems.updated_at
+    }).from(packs).leftJoin(packItems, eq(packs.pack_id, packItems.pack_id)).leftJoin(products, eq(packItems.product_id, products.product_id)).all();
+
+    // Agrupar los resultados por pack_id
+    const packsMap = new Map<string, Pack & { pack_items: (PackItem & { product_name: string })[] }>();
+
+    for (const row of results) {
+      const packId = row.pack_id;
+
+      // Si el pack no existe en el mapa, crearlo
+      if (!packsMap.has(packId)) {
+        packsMap.set(packId, {
+          pack_id: row.pack_id,
+          name: row.name,
+          description: row.description,
+          price: row.price,
+          active: row.active,
+          picture: row.picture,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+          pack_items: []
+        });
+      }
+
+      // Si existe un packItem en esta fila, agregarlo al array
+      if (row.pack_item_id) {
+        const pack = packsMap.get(packId)!;
+        pack.pack_items.push({
+          pack_item_id: row.pack_item_id,
+          pack_id: row.pack_id,
+          product_id: row.product_id!,
+          product_name: row.product_name!,
+          quantity: row.quantity!,
+          created_at: row.item_created_at!,
+          updated_at: row.item_updated_at!
+        });
+      }
+    }
+
+    // Convertir el Map a array
+    return Array.from(packsMap.values());
   } catch (error) {
     throw new AppError("Error al obtener los packs.", 400, []);
   }

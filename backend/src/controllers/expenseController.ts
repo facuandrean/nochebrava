@@ -22,7 +22,7 @@ const getExpenses = async (_req: Request, res: Response): Promise<void> => {
         const expenses: Expense[] = await expenseService.getExpenses();
         if (expenses.length === 0) {
             res.status(404).json({
-                status: "Operación fallida",
+                status: "Operación exitosa.",
                 message: "No se encontraron gastos.",
                 data: []
             });
@@ -72,7 +72,7 @@ const getExpenseById = async (req: Request, res: Response): Promise<void> => {
         const expense: Expense | undefined = await expenseService.getExpenseById(expense_id);
         if (!expense) {
             res.status(404).json({
-                status: "Operación fallida",
+                status: "Operación exitosa.",
                 message: "Gasto no encontrado.",
                 data: []
             });
@@ -126,7 +126,7 @@ const getExpenseItems = async (req: Request, res: Response): Promise<void> => {
         const existsExpense = await expenseService.getExpenseById(expense_id);
         if (!existsExpense) {
             res.status(404).json({
-                status: "Operación fallida",
+                status: "Operación exitosa.",
                 message: "Gasto no encontrado.",
                 data: []
             });
@@ -136,7 +136,7 @@ const getExpenseItems = async (req: Request, res: Response): Promise<void> => {
         const items: ExpenseItem[] = await expenseService.getExpenseItems(expense_id);
         if (items.length === 0) {
             res.status(404).json({
-                status: "Operación fallida",
+                status: "Operación exitosa.",
                 message: "No se encontraron items en el gasto.",
                 data: []
             });
@@ -236,7 +236,7 @@ const deleteExpense = async (req: Request, res: Response): Promise<void> => {
         const expense: Expense | undefined = await expenseService.getExpenseById(expense_id);
         if (!expense) {
             res.status(404).json({
-                status: "Operación fallida",
+                status: "Operación exitosa.",
                 message: "Gasto no encontrado.",
                 data: []
             });

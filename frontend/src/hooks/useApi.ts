@@ -3,6 +3,11 @@ import { useState, useEffect, useRef } from "react";
 type Data<T> = T | null;
 type ErrorType = Error | null;
 
+// Tipo base para respuestas que pueden contener un mensaje de error
+interface BaseBackendResponse {
+  message?: string;
+}
+
 interface ApiRequestParams<TRequest> {
   id?: string;
   url: string;
@@ -12,14 +17,15 @@ interface ApiRequestParams<TRequest> {
   autoFetch?: boolean;
 }
 
-export const useApi = <TRequest = unknown, TResponse = TRequest>({ id, url, method, headers, autoFetch = false }: ApiRequestParams<TRequest>) => {
+export const useApi = <TRequest = unknown, TResponse = unknown>({ id, url, method, headers, autoFetch = false }: ApiRequestParams<TRequest>) => {
+
+  // TResponse representa toda la respuesta del backend (incluyendo status, message, data)
   const [data, setData] = useState<Data<TResponse>>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<ErrorType>(null);
   const controllerRef = useRef<AbortController | null>(null);
 
   const trigger = async (body?: TRequest) => {
-
     if (!url) return;
 
     // Cancelar petición anterior si existe
@@ -46,9 +52,11 @@ export const useApi = <TRequest = unknown, TResponse = TRequest>({ id, url, meth
 
       const jsonData: TResponse = await response.json();
 
+      console.log('jsonData', jsonData)
+
       if (!response.ok) {
-        const backendMessage = (jsonData as unknown as { message: string })?.message;
-        const errorMessage = "Error: " + backendMessage || `Error ${response.status}: ${response.statusText}`;
+        // Intentamos acceder al mensaje de error si TResponse tiene la estructura esperada
+        const errorMessage = "Error: " + (jsonData as BaseBackendResponse)?.message || `Error ${response.status}: ${response.statusText}`;
         throw new Error(errorMessage);
       }
 
@@ -58,6 +66,8 @@ export const useApi = <TRequest = unknown, TResponse = TRequest>({ id, url, meth
       return jsonData;
     } catch (error) {
       if (error instanceof Error && error.name !== 'AbortError') {
+        setLoading(false);
+        setData(null);
         setError(error);
       }
     } finally {

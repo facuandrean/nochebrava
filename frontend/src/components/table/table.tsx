@@ -44,7 +44,13 @@ export function Table<T extends BaseEntity>({ columns, data, classNameEspecificT
                       ? i + 1
                       : String(col.accessor).includes("description") && row[col.accessor] === null || row[col.accessor] === ""
                         ? <span className="text-muted">Sin descripción</span>
-                        : String(row[col.accessor])
+                        : Array.isArray(row[col.accessor])
+                          ? (row[col.accessor] as Array<Record<string, unknown>>).map((item, index) => (
+                            <div key={index} className="mb-1">
+                              {String(item.quantity) + " " + String(item.product_name)}
+                            </div>
+                          ))
+                          : String(row[col.accessor])
                     }
                   </span>
                 </div>

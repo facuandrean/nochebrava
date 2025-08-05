@@ -14,9 +14,10 @@ interface ProductSelectionProps {
   idModal: string;
   apiError?: string;
   apiPostPackItemsLoading?: boolean;
+  validationError?: string | null;
 }
 
-export const ProductSelection = ({ productsForSelection, selectedProducts, setSelectedProducts, setStep, onPrevious, setPackData, idModal, apiError, apiPostPackItemsLoading = false }: ProductSelectionProps) => {
+export const ProductSelection = ({ productsForSelection, selectedProducts, setSelectedProducts, setStep, onPrevious, setPackData, idModal, apiError, apiPostPackItemsLoading = false, validationError }: ProductSelectionProps) => {
 
   // Maneja el estado de los selectables y los datos del producto seleccionado (el id por un lado y toda la información del producto por el otro).
   // Cuando vaya a setear el estado, tengo que pasar el id del selectable, el id del producto seleccionado y los datos del producto seleccionado.
@@ -60,6 +61,14 @@ export const ProductSelection = ({ productsForSelection, selectedProducts, setSe
 
   // Al montar, inicializar productSelector desde selectedProducts.
   useEffect(() => {
+    if (apiError) {
+      const messageError = document.querySelector(".message-error");
+      if (messageError) {
+        messageError.classList.remove("d-block");
+        messageError.classList.add("d-none");
+      }
+    }
+
     if (selectedProducts && selectedProducts.length > 0) {
       const initialSelectors = selectedProducts.map((product, index) => ({
         idSelectable: index,
@@ -103,8 +112,7 @@ export const ProductSelection = ({ productsForSelection, selectedProducts, setSe
     }
 
     setPreviousLoading(apiPostPackItemsLoading);
-
-  }, [apiPostPackItemsLoading, apiError, idModal, previousLoading, setSubmitSuccess]);
+  }, [apiPostPackItemsLoading, setSubmitSuccess, apiError, idModal, previousLoading]);
 
   // Agrega un nuevo selectable.
   const addProductSelector = () => {
@@ -258,6 +266,12 @@ export const ProductSelection = ({ productsForSelection, selectedProducts, setSe
       {submitSuccess && !apiPostPackItemsLoading && !apiError && (
         <div className="mt-3 p-2 text-center" style={{ backgroundColor: '#d4edda', color: '#155724', borderRadius: '4px' }}>
           ¡Registro creado exitosamente!
+        </div>
+      )}
+
+      {validationError && (
+        <div className="mt-3 p-2 text-center message-error" style={{ backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px' }}>
+          {validationError}
         </div>
       )}
 

@@ -37,7 +37,7 @@ const getPacks = async (_req: Request, res: Response): Promise<void> => {
 
     if (packs.length === 0) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontraron packs.",
         data: []
       });
@@ -104,7 +104,7 @@ const getPackById = async (req: Request, res: Response): Promise<void> => {
 
     if (!pack) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontró el pack.",
         data: []
       });
@@ -231,7 +231,7 @@ const updatePack = async (req: Request, res: Response): Promise<void> => {
     const existsPack = await packService.getPackById(pack_id);
     if (!existsPack) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontró el pack.",
         data: []
       });
@@ -300,7 +300,7 @@ const deletePack = async (req: Request, res: Response): Promise<void> => {
     const existsPack: Pack | undefined = await packService.getPackById(pack_id);
     if (!existsPack) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontró el pack.",
         data: []
       });

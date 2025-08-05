@@ -21,7 +21,7 @@ const getPackItems = async (_req: Request, res: Response): Promise<void> => {
 
     if (packItems.length === 0) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontraron items de packs.",
         data: []
       });
@@ -71,7 +71,7 @@ const getPackItemById = async (req: Request, res: Response): Promise<void> => {
 
     if (!packItem) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontró el item de pack.",
         data: []
       });
@@ -122,7 +122,7 @@ const getPackItemsByPackId = async (req: Request, res: Response): Promise<void> 
 
     if (!pack) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontró el pack.",
         data: []
       });
@@ -133,7 +133,7 @@ const getPackItemsByPackId = async (req: Request, res: Response): Promise<void> 
 
     if (packItems.length === 0) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontraron items para este pack.",
         data: []
       });
@@ -196,7 +196,7 @@ const postPackItem = async (req: Request, res: Response): Promise<void> => {
     const existsPack = await packService.getPackById(requestBody[0].pack_id);
     if (!existsPack) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontró el pack.",
         data: []
       });
@@ -262,7 +262,7 @@ const putPackItem = async (req: Request, res: Response): Promise<void> => {
     const existsPackItem = await packItemService.getPackItemById(pack_item_id);
     if (!existsPackItem) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontró el item de pack.",
         data: []
       });
@@ -314,7 +314,7 @@ const deletePackItem = async (req: Request, res: Response): Promise<void> => {
     const existsPackItem: PackItem | undefined = await packItemService.getPackItemById(pack_item_id);
     if (!existsPackItem) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontró el item de pack.",
         data: []
       });

@@ -28,7 +28,7 @@ const getProductsByCategory = async (req: Request, res: Response): Promise<void>
     const category: Category | undefined = await categoryService.getCategoryById(category_id);
     if (!category) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "Categoría no encontrada.",
         data: []
       });
@@ -39,7 +39,7 @@ const getProductsByCategory = async (req: Request, res: Response): Promise<void>
 
     if (productsByCategory.length === 0) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontraron productos para la categoría " + category_id,
         data: []
       });
@@ -96,7 +96,7 @@ const getCategoriesByProduct = async (req: Request, res: Response): Promise<void
     const product: Product | undefined = await productService.getProductById(product_id);
     if (!product) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "Producto no encontrado.",
         data: []
       });
@@ -106,7 +106,7 @@ const getCategoriesByProduct = async (req: Request, res: Response): Promise<void
     const categoriesByProduct: Category[] = await productCategoryService.getCategoriesByProduct(product_id);
     if (categoriesByProduct.length === 0) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontraron categorías para el producto.",
         data: []
       });
@@ -162,7 +162,7 @@ const assignCategoryToProduct = async (req: Request, res: Response): Promise<voi
     const product: Product | undefined = await productService.getProductById(product_id);
     if (!product) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "Producto no encontrado.",
         data: []
       });
@@ -172,7 +172,7 @@ const assignCategoryToProduct = async (req: Request, res: Response): Promise<voi
     const category: Category | undefined = await categoryService.getCategoryById(category_id);
     if (!category) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "Categoría no encontrada.",
         data: []
       });
@@ -231,7 +231,7 @@ const updateProductCategory = async (req: Request, res: Response): Promise<void>
     const product_old: Product | undefined = await productService.getProductById(product_id_old);
     if (!product_old) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "Producto a actualizar no encontrado.",
         data: []
       });
@@ -241,7 +241,7 @@ const updateProductCategory = async (req: Request, res: Response): Promise<void>
     const category_old: Category | undefined = await categoryService.getCategoryById(category_id_old);
     if (!category_old) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "Categoría a actualizar no encontrada.",
         data: []
       });
@@ -251,7 +251,7 @@ const updateProductCategory = async (req: Request, res: Response): Promise<void>
     const product_new: Product | undefined = await productService.getProductById(product_id);
     if (!product_new) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "Producto a relacionar con una categoría no encontrado.",
         data: []
       });
@@ -261,7 +261,7 @@ const updateProductCategory = async (req: Request, res: Response): Promise<void>
     const category_new: Category | undefined = await categoryService.getCategoryById(category_id);
     if (!category_new) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "Categoría a relacionar con un producto no encontrada.",
         data: []
       });
@@ -320,7 +320,7 @@ const unassignCategoryFromProduct = async (req: Request, res: Response): Promise
     const product: Product | undefined = await productService.getProductById(product_id);
     if (!product) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "Producto no encontrado.",
         data: []
       });
@@ -330,7 +330,7 @@ const unassignCategoryFromProduct = async (req: Request, res: Response): Promise
     const category: Category | undefined = await categoryService.getCategoryById(category_id);
     if (!category) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "Categoría no encontrada.",
         data: []
       });
@@ -388,7 +388,7 @@ const assignMultipleCategoriesToProduct = async (req: Request, res: Response): P
     const product: Product | undefined = await productService.getProductById(product_id);
     if (!product) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "Producto no encontrado.",
         data: []
       });
@@ -400,7 +400,7 @@ const assignMultipleCategoriesToProduct = async (req: Request, res: Response): P
       const category: Category | undefined = await categoryService.getCategoryById(category_id);
       if (!category) {
         res.status(404).json({
-          status: "Operación fallida.",
+          status: "Operación exitosa.",
           message: `Categoría ${category_id} no encontrada.`,
           data: []
         });
@@ -461,7 +461,7 @@ const replaceProductCategories = async (req: Request, res: Response): Promise<vo
     const product: Product | undefined = await productService.getProductById(product_id);
     if (!product) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "Producto no encontrado.",
         data: []
       });
@@ -473,7 +473,7 @@ const replaceProductCategories = async (req: Request, res: Response): Promise<vo
       const category: Category | undefined = await categoryService.getCategoryById(category_id);
       if (!category) {
         res.status(404).json({
-          status: "Operación fallida.",
+          status: "Operación exitosa.",
           message: `Categoría ${category_id} no encontrada.`,
           data: []
         });

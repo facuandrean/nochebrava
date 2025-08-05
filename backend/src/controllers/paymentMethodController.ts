@@ -23,7 +23,7 @@ const getAllPaymentMethods = async (_req: Request, res: Response): Promise<void>
 
     if (paymentMethods.length === 0) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontraron métodos de pago.",
         data: []
       });
@@ -77,7 +77,7 @@ const getPaymentMethodById = async (req: Request, res: Response): Promise<void> 
 
     if (!paymentMethod) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontró el método de pago.",
         data: []
       });
@@ -177,7 +177,7 @@ const deletePaymentMethod = async (req: Request, res: Response): Promise<void> =
 
     if (!paymentMethod) {
       res.status(404).json({
-        status: "Operación fallida.",
+        status: "Operación exitosa.",
         message: "No se encontró el método de pago.",
         data: []
       });
@@ -192,7 +192,7 @@ const deletePaymentMethod = async (req: Request, res: Response): Promise<void> =
       data: []
     });
     return;
-    
+
   } catch (error) {
     if (error instanceof AppError) {
       res.status(error.status).json({

@@ -23,7 +23,7 @@ const getAllItemTypes = async (_req: Request, res: Response): Promise<void> => {
 
         if (itemTypes.length === 0) {
             res.status(404).json({
-                status: "Operación fallida",
+                status: "Operación exitosa.",
                 message: "No se encontró ningún tipo de item.",
                 data: []
             });
@@ -76,7 +76,7 @@ const getItemTypeById = async (req: Request, res: Response): Promise<void> => {
 
         if (!itemType) {
             res.status(404).json({
-                status: "Operación fallida",
+                status: "Operación exitosa.",
                 message: "No se encontró el tipo de item.",
                 data: []
             });
@@ -176,7 +176,7 @@ const updateItemType = async (req: Request, res: Response): Promise<void> => {
         const existingItemType: ItemType | undefined = await itemTypeService.getItemTypeById(item_type_id);
         if (!existingItemType) {
             res.status(404).json({
-                status: "Operación fallida",
+                status: "Operación exitosa.",
                 message: "No se encontró el tipo de item.",
                 data: []
             });
@@ -232,7 +232,7 @@ const deleteItemType = async (req: Request, res: Response): Promise<void> => {
         const existingItemType: ItemType | undefined = await itemTypeService.getItemTypeById(item_type_id);
         if (!existingItemType) {
             res.status(404).json({
-                status: "Operación fallida",
+                status: "Operación exitosa.",
                 message: "No se encontró el tipo de item.",
                 data: []
             });
