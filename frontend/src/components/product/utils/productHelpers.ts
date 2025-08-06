@@ -3,6 +3,8 @@ import type { Product, ParsedProduct, ProductRequest } from "../models";
 
 /**
  * Parsea los datos del producto para mostrar en la tabla
+ * @param products - Datos de los productos
+ * @returns - Datos de los productos parseados
  */
 export const parseProductData = (products: Product[]): ParsedProduct[] => {
   return products.map((product) => ({
@@ -16,6 +18,8 @@ export const parseProductData = (products: Product[]): ParsedProduct[] => {
 
 /**
  * Parsea los datos del producto para enviar al backend
+ * @param formData - Datos del formulario sin procesar
+ * @returns - Datos del formulario parseados
  */
 export const parseProductDataForBackend = (formData: ProductRequest): Partial<ProductRequest> => {
   const productData: Partial<ProductRequest> = {};
@@ -36,17 +40,3 @@ export const parseProductDataForBackend = (formData: ProductRequest): Partial<Pr
 
   return productData;
 }
-
-/**
- * Valida si el producto tiene stock disponible
- */
-export const hasStock = (product: Product): boolean => {
-  return product.stock > 0;
-};
-
-/**
- * Filtra productos activos
- */
-export const getActiveProducts = (products: Product[]): Product[] => {
-  return products.filter(product => product.active);
-}; 

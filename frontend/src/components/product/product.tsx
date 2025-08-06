@@ -4,16 +4,15 @@ import { ModalPost } from "../modal/modalPost";
 import { Section } from "../section/section";
 import { Table, type Column } from "../table/table";
 import type { ParsedProduct } from "./models";
-import { parseProductData, parseProductDataForBackend } from "./utils";
-import type { Product, ProductRequest } from "./models/product.model";
+import type { ProductRequest } from "./models/product.model";
 import "./product.css";
 import type { SubmitHandler } from "react-hook-form";
-import { useApi } from "../../hooks/useApi";
 import { ModalEdit } from "../modal/modalEdit";
 import { FormProduct } from "./components/formProduct";
 import { useEffect, useState } from "react";
 import { ModalDelete } from "../modal/modalDelete";
 import { Filter } from "../filter";
+import { useDeleteProducts, useGetProducts, usePatchProducts, usePostProducts } from "./hooks";
 
 const columns: Column<ParsedProduct>[] = [
   { header: "N°", accessor: "product_id" },
@@ -28,88 +27,148 @@ const columns: Column<ParsedProduct>[] = [
 
 export const Products = () => {
 
-  const [filteredData, setFilteredData] = useState<ParsedProduct[]>([]);
   const [dataEditProduct, setDataEditProduct] = useState<ParsedProduct | null>(null);
   const [dataDeleteProduct, setDataDeleteProduct] = useState<ParsedProduct | null>(null);
+  const [filteredDataProducts, setFilteredDataProducts] = useState<ParsedProduct[]>([]);
 
-  const { data, loading, error } = useApi<{ status: string, message: string, data: Product[] }>({
-    url: "http://localhost:3000/api/v1/products",
-    method: "GET",
-    autoFetch: true
-  });
+  const [successState, setSuccessState] = useState(false);
 
-  const { trigger: triggerPost, loading: apiLoading, error: apiError } = useApi<ProductRequest>({
-    url: "http://localhost:3000/api/v1/products",
-    method: "POST"
-  });
+  const { products, parsedDataProducts, loading, error } = useGetProducts();
+  const { postProduct, loading: apiLoadingPost, error: apiErrorPost } = usePostProducts();
+  const { patchProduct, loading: apiLoadingPatch, error: apiErrorPatch } = usePatchProducts({ dataEditProduct });
+  const { deleteProduct, loading: apiDeleteLoading, error: apiDeleteError } = useDeleteProducts({ dataDeleteProduct });
 
-  const { trigger: triggerEdit, loading: apiEditLoading, error: apiEditError } = useApi<ProductRequest>({
-    id: dataEditProduct?.product_id,
-    url: "http://localhost:3000/api/v1/products",
-    method: "PATCH"
-  });
-
-  const { trigger: triggerDelete, loading: apiDeleteLoading, error: apiDeleteError } = useApi<ProductRequest>({
-    id: dataDeleteProduct?.product_id,
-    url: "http://localhost:3000/api/v1/products",
-    method: "DELETE"
-  });
-
+  /**
+   * Se ejecuta cuando se cargan los productos y se setean en el estado filteredDataProducts.
+   * Tiene la misma información que parsedDataProducts, pero es necesario para el filtrado.
+   */
   useEffect(() => {
-    if (data) {
-      const products = data.data;
-      const parsedProducts = parseProductData(products);
-      setFilteredData(parsedProducts);
+    setFilteredDataProducts(parsedDataProducts);
+  }, [parsedDataProducts]);
+
+  /**
+   * Se ejecuta cuando se cambia el texto de búsqueda en el input del filtro.
+   * Se filtra la información de parsedDataProducts y se setea en el estado filteredDataProducts.
+   */
+  const handleFilterChange = (searchText: string) => {
+    if (searchText.trim() === "") {
+      setFilteredDataProducts(parsedDataProducts);
+      return;
     }
-  }, [data]);
 
-  if (error) return <div>{error.message}</div>;
-  if (loading) return <Loading className="loading-container" />;
-
-  const onSubmit: SubmitHandler<ProductRequest> = async (formData: ProductRequest) => {
-    const productData = parseProductDataForBackend(formData);
-
-    await triggerPost(productData as ProductRequest);
+    const filtered = parsedDataProducts.filter(product =>
+      product.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFilteredDataProducts(filtered);
   };
 
+  /**
+   * Se ejecuta cuando se crea un producto exitosamente.
+   * Se setea el estado successState a true y se muestra el mensaje de éxito.
+   * Se cierra el modal de creación de producto y se recarga la página.
+   */
+  const handleSuccess = (idModal: string) => {
+    setSuccessState(true);
+    setTimeout(() => {
+      setSuccessState(false);
+
+      const modal = document.getElementById(idModal);
+      if (modal) {
+        const bootstrapModal = (window as typeof window & { bootstrap?: { Modal?: { getInstance: (element: Element) => { hide: () => void } | null } } }).bootstrap?.Modal?.getInstance(modal);
+        bootstrapModal?.hide();
+      }
+
+      window.location.reload();
+    }, 2000);
+  }
+
+  /**
+   * Se ejecuta cuando se envía el formulario de creación de producto.
+   * Se parsean los datos del formulario y se envían a la API.
+   * Es de tipo ProductRequest porque es el tipo de datos que se envía a la API.
+   * @param formData - Datos del formulario de creación de producto.
+   */
+  const onSubmit: SubmitHandler<ProductRequest> = async (formData: ProductRequest) => {
+    try {
+      const response = await postProduct(formData);
+      if (response) {
+        handleSuccess("createProductModal");
+      }
+    } catch (error) {
+      console.log('Error al crear el producto', error);
+    }
+  };
+
+  /**
+   * Se ejecuta cuando se hace click en el botón de edición de un producto.
+   * Se setea el estado dataEditProduct con los datos del producto.
+   * Cuando se abre la modal de edición, se carga cada campo del formulario con los datos del producto.
+   * @param row - Datos del producto.
+   */
   const onEdit = (row: ParsedProduct) => {
     setDataEditProduct(row);
   }
 
+  /**
+   * Se ejecuta cuando se envía el formulario de edición de producto.
+   * Se parsean los datos del formulario y se envían a la API.
+   * Es de tipo ProductRequest porque es el tipo de datos que se envía a la API.
+   * @param formData - Datos del formulario de edición de producto.
+   */
   const onEditSubmit: SubmitHandler<ProductRequest> = async (formData: ProductRequest) => {
-    const productData = parseProductDataForBackend(formData);
+    try {
+      setDataEditProduct(prev => prev ? {
+        ...prev,
+        name: formData.name,
+        description: formData.description,
+        price: formData.price,
+        stock: formData.stock,
+        active: formData.active ? "Si" : "No"
+      } : null);
 
-    await triggerEdit(productData as ProductRequest);
+      const response = await patchProduct(formData);
+
+      if (response) {
+        handleSuccess("editProductModal");
+      }
+    } catch (error) {
+      console.log('Error al actualizar el producto', error)
+    }
   }
 
-  const onDelete = (row: ParsedProduct) => {
+  /**
+   * Se ejecuta cuando se hace click en el botón de eliminación de un producto.
+   * Se setea el estado dataDeleteProduct con los datos del producto.
+   * @param row - Datos del producto.
+   */
+  const onDelete = async (row: ParsedProduct) => {
     setDataDeleteProduct(row);
   }
 
+  /**
+   * Se ejecuta cuando se envía el formulario de eliminación de producto.
+   * Se parsean los datos del formulario y se envían a la API.
+   * Es de tipo ProductRequest porque es el tipo de datos que se envía a la API.
+   * @param formData - Datos del formulario de eliminación de producto.
+   */
   const onDeleteSubmit = async () => {
-    await triggerDelete(dataDeleteProduct as unknown as ProductRequest);
-  }
-
-  const onFilterChange = (searchText: string) => {
-    const originalData = parseProductData(data?.data || []);
-
-    if (searchText.trim() === "") {
-      setFilteredData(originalData);
-      return;
+    try {
+      const response = await deleteProduct();
+      if (response) {
+        handleSuccess("deleteProductModal");
+      }
+    } catch (error) {
+      console.log('Error al eliminar el producto', error);
     }
-
-    const filtered = originalData.filter(product =>
-      product.name.toLowerCase().includes(searchText.toLowerCase())
-    );
-
-    setFilteredData(filtered);
   }
+
+  if (loading) return <Loading className="loading-container" />;
 
   return (
     <>
       <Section
-        title="Productos"
-        description="Gestiona la carga, modificación y eliminación de los productos que vendes.">
+        title="Administrar Productos"
+        description="Gestiona la carga, modificación y eliminación de los productos.">
 
         <Button
           label="Crear producto"
@@ -117,24 +176,26 @@ export const Products = () => {
           dataBsToggle="modal"
           dataBsTarget="#createProductModal" />
 
-        <Filter onFilterChange={onFilterChange} />
+        <Filter onFilterChange={handleFilterChange} />
 
         <div className="table-container">
           {(() => {
-            if (loading) return <Loading className="table-container-loading" />;
-            if (!data?.data || data.data.length === 0) return <div className="no-results-message"><span>No hay productos.</span></div>;
-            if (filteredData.length === 0) return <div className="no-results-message"><span>No se encontraron resultados.</span></div>;
+            if (loading) return <Loading className="table-container-loading" />
+            if (error && !loading) return <div>{error.message}</div>;
+            if (products.length === 0 && !loading) return <div className="no-results-message"><span>No hay datos.</span></div>;
+            if (filteredDataProducts.length === 0 && !loading) return <div className="no-results-message"><span>No se encontraron coincidencias.</span></div>;
 
             return (
               <Table
                 columns={columns}
-                data={filteredData}
+                data={filteredDataProducts}
                 classNameEspecificTable="table-products"
                 dataBsToggle="modal"
                 dataBsTargetEdit="#editProductModal"
                 dataBsTargetDelete="#deleteProductModal"
                 onEdit={onEdit}
-                onDelete={onDelete} />
+                onDelete={onDelete}
+              />
             )
           })()}
         </div>
@@ -144,15 +205,17 @@ export const Products = () => {
         id="createProductModal"
         title="Crear producto"
         formId="createProductForm"
-        loading={apiLoading}>
+        loading={apiLoadingPost}>
 
         <FormProduct
           idModal="createProductModal"
           formId="createProductForm"
           onSubmit={onSubmit}
-          apiLoading={apiLoading}
-          apiError={apiError}
+          apiLoading={apiLoadingPost}
+          apiError={apiErrorPost}
           mode="create"
+          success={successState}
+          successMessage="¡Producto creado exitosamente!"
         />
 
       </ModalPost>
@@ -161,23 +224,26 @@ export const Products = () => {
         id="editProductModal"
         title="Editar producto"
         formId="editProductForm"
-        loading={apiEditLoading}>
+        loading={apiLoadingPatch}>
 
         <FormProduct
           idModal="editProductModal"
           formId="editProductForm"
           onSubmit={onEditSubmit}
-          apiLoading={apiEditLoading}
-          apiError={apiEditError}
+          apiLoading={apiLoadingPatch}
+          apiError={apiErrorPatch}
           mode="edit"
+          success={successState}
+          successMessage="¡Producto actualizado exitosamente!"
           initialValues={dataEditProduct ? {
             name: dataEditProduct.name,
             description: dataEditProduct.description,
             price: dataEditProduct.price,
             stock: dataEditProduct.stock,
-            active: dataEditProduct.active === "No" ? false : true
+            active: dataEditProduct.active === "Si" ? true : false
           } : undefined}
         />
+
       </ModalEdit>
 
       <ModalDelete
@@ -193,16 +259,19 @@ export const Products = () => {
           apiLoading={apiDeleteLoading}
           apiError={apiDeleteError}
           mode="delete"
+          success={successState}
+          successMessage="¡Producto eliminado exitosamente!"
           initialValues={dataDeleteProduct ? {
             name: dataDeleteProduct.name,
             description: dataDeleteProduct.description,
             price: dataDeleteProduct.price,
             stock: dataDeleteProduct.stock,
-            active: dataDeleteProduct.active === "No" ? false : true
+            active: dataDeleteProduct.active === "Si"
           } : undefined}
         />
 
       </ModalDelete>
     </>
   );
+
 }

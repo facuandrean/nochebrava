@@ -32,8 +32,6 @@ export const FormCategory = ({
   successMessage
 }: FormCategoryProps) => {
 
-  console.log('initialValues', initialValues)
-
   return (
     <GenericForm<CategoryRequest>
       idModal={idModal}

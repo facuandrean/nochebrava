@@ -30,12 +30,6 @@ export interface ProductRequest {
 }
 
 export interface ProductResponse {
-  data: Product;
-  status: string;
-  message: string;
-}
-
-export interface ProductListResponse {
   data: Product[];
   status: string;
   message: string;

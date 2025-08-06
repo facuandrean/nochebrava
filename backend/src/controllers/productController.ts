@@ -21,19 +21,10 @@ const getProducts = async (_req: Request, res: Response): Promise<void> => {
   try {
     const products: Product[] = await productService.getProducts();
 
-    if (products.length === 0) {
-      res.status(404).json({
-        status: 'Operación exitosa.',
-        message: 'No se han encontrado productos.',
-        data: []
-      });
-      return;
-    }
-
     res.status(200).json({
       status: 'Operación exitosa',
-      message: 'Productos obtenidos correctamente.',
-      data: products
+      message: products.length > 0 ? 'Productos obtenidos correctamente.' : 'No se han encontrado productos.',
+      data: products.length > 0 ? products : []
     });
     return;
 

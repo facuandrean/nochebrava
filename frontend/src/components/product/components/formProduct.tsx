@@ -20,9 +20,21 @@ interface FormProductProps {
   apiError: Error | null;
   mode: "create" | "edit" | "delete";
   initialValues?: ProductRequest;
+  success?: boolean;
+  successMessage?: string;
 }
 
-export const FormProduct = ({ idModal, formId, onSubmit, apiLoading, apiError, mode, initialValues }: FormProductProps) => {
+export const FormProduct = ({
+  idModal,
+  formId,
+  onSubmit,
+  apiLoading,
+  apiError,
+  mode,
+  initialValues,
+  success,
+  successMessage
+}: FormProductProps) => {
   return (
     <GenericForm<ProductRequest>
       idModal={idModal}
@@ -31,6 +43,9 @@ export const FormProduct = ({ idModal, formId, onSubmit, apiLoading, apiError, m
       onSubmit={onSubmit}
       loading={apiLoading}
       error={apiError}
+      success={success}
+      successMessage={successMessage}
+      mode={mode}
     >
       {({ control, errors }) => (
         mode === "delete" ? (

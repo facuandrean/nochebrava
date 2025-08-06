@@ -21,18 +21,9 @@ const getCategories = async (_req: Request, res: Response): Promise<void> => {
   try {
     const categories: Category[] = await categoryService.getCategories();
 
-    if (categories.length === 0) {
-      res.status(404).json({
-        status: "Operación exitosa.",
-        message: "No se encontraron categorías.",
-        data: []
-      });
-      return;
-    };
-
     res.status(200).json({
       status: "Operación exitosa.",
-      message: "Categorías obtenidas correctamente.",
+      message: categories.length === 0 ? "No se encontraron categorías." : "Categorías obtenidas correctamente.",
       data: categories
     });
     return;

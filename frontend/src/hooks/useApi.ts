@@ -59,6 +59,7 @@ export const useApi = <TRequest = unknown, TResponse = unknown>({ id, url, metho
       }
 
       setData(jsonData);
+      setLoading(false);
       setError(null);
 
       return jsonData;

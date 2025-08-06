@@ -12,9 +12,7 @@ import { ModalDelete } from "../modal/modalDelete";
 import { Filter } from "../filter";
 import { FormCategory } from "./components";
 import { useGetCategories } from "./hooks";
-import { usePostCategories } from "./hooks/usePostCategories";
-import { usePatchCategories } from "./hooks/usePutCategories";
-import { useDeleteCategories } from "./hooks/useDeleteCategories";
+import { usePostCategories, usePatchCategories, useDeleteCategories } from "./hooks";
 
 const columns: Column<ParsedCategory>[] = [
   { header: "N°", accessor: "category_id" },
@@ -32,7 +30,7 @@ export const Categories = () => {
 
   const [successState, setSuccessState] = useState(false);
 
-  const { parsedDataCategories, loading, error } = useGetCategories();
+  const { categories, parsedDataCategories, loading, error } = useGetCategories();
   const { postCategory, loading: apiLoadingPost, error: apiErrorPost } = usePostCategories();
   const { patchCategory, loading: apiLoadingPatch, error: apiErrorPatch } = usePatchCategories({ dataEditCategory });
   const { deleteCategory, loading: apiDeleteLoading, error: apiDeleteError } = useDeleteCategories({ dataDeleteCategory });
@@ -116,6 +114,12 @@ export const Categories = () => {
    */
   const onEditSubmit: SubmitHandler<CategoryRequest> = async (formData: CategoryRequest) => {
     try {
+      setDataEditCategory(prev => prev ? {
+        ...prev,
+        name: formData.name,
+        description: formData.description,
+      } : null);
+
       const response = await patchCategory(formData);
       if (response) {
         handleSuccess("editCategoryModal");
@@ -151,7 +155,6 @@ export const Categories = () => {
     }
   }
 
-  if (error && !loading) return <div>{error.message}</div>;
   if (loading) return <Loading className="loading-container" />;
 
   return (
@@ -170,7 +173,9 @@ export const Categories = () => {
 
         <div className="table-container">
           {(() => {
-            if (loading) return <Loading className="table-container-loading" />;
+            if (loading) return <Loading className="table-container-loading" />
+            if (error && !loading) return <div>{error.message}</div>;
+            if (categories.length === 0 && !loading) return <div className="no-results-message"><span>No hay datos.</span></div>;
             if (filteredDataCategories.length === 0 && !loading) return <div className="no-results-message"><span>No se encontraron coincidencias.</span></div>;
 
             return (
