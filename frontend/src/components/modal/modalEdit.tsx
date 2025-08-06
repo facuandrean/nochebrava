@@ -1,14 +1,21 @@
 import "./modal.css";
 
 interface ModalEditProps {
+  // Estas propiedades son para el modal.
   id: string;
   title: string;
-  children: React.ReactNode;
   formId: string; // ID del formulario al que se conectarán los botones
-  loading?: boolean; // Para deshabilitar botones mientras se envía
+  loading: boolean;
+  children: React.ReactNode;
+
+  // Estas propiedades son para wizards.
+  step?: number;
+  onCancel?: () => void;
+  onSubmit?: () => void;
+  onFinish?: () => void;
 }
 
-export const ModalEdit = ({ id, title, children, formId, loading = false }: ModalEditProps) => {
+export const ModalEdit = ({ id, title, formId, loading = false, children, step, onCancel, onSubmit, onFinish }: ModalEditProps) => {
   return (
     <>
       <div className="modal fade" id={id} aria-hidden="true" aria-labelledby={`${id}Label`} tabIndex={-1}>
@@ -22,10 +29,22 @@ export const ModalEdit = ({ id, title, children, formId, loading = false }: Moda
               {children}
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" disabled={loading}>
+              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" disabled={loading} onClick={onCancel}>
                 Cancelar
               </button>
-              <button type="submit" form={formId} className="btn btn-success" disabled={loading}>
+              <button
+                type="submit"
+                form={formId}
+                className="btn btn-success"
+                disabled={loading}
+                onClick={() => {
+                  if (step === 1) {
+                    onSubmit?.();
+                  } else {
+                    onFinish?.();
+                  }
+                }}
+              >
                 {loading ? "Actualizando..." : "Actualizar"}
               </button>
             </div>

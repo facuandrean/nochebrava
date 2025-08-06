@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type Control, type DefaultValues, type FieldErrors, type FieldValues, type SubmitHandler } from "react-hook-form"
 import { Loading } from "../loading/loading";
 
@@ -9,63 +9,49 @@ interface GenericFormProps<T extends FieldValues> {
   onSubmit: SubmitHandler<T>;
   loading?: boolean;
   error?: Error | null;
+  success?: boolean;
+  successMessage?: string;
   children: (methods: {
     control: Control<T>;
     errors: FieldErrors<T>;
   }) => React.ReactNode;
+  mode?: "create" | "edit" | "delete";
 }
 
-export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultValues, onSubmit, loading = false, error = null, children }: GenericFormProps<T>) => {
+export const GenericForm = <T extends FieldValues>({
+  idModal,
+  formId,
+  defaultValues,
+  onSubmit,
+  loading = false,
+  error = null,
+  success = false,
+  successMessage = "",
+  children }: GenericFormProps<T>) => {
 
-  // Para evitar que se resetee el formulario cuando se abre el modal
-  const previousDefaultValues = useRef<T | null>(null);
+  const [errorMessage, setErrorMessage] = useState<boolean>(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const { control, handleSubmit, formState: { errors }, reset } = useForm<T>({
     mode: "onSubmit",
     defaultValues: defaultValues as DefaultValues<T>
   });
 
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [previousLoading, setPreviousLoading] = useState(false);
-
+  // Actualizar valores del formulario cuando cambien los defaultValues. Sin esto, los inputs aparecen vacíos y si modifico individualmente los generics inputs mandandoles los defaultvalues, por más que aparezca los datos del registro, lo toma como vacío.
   useEffect(() => {
-    if (previousLoading && !loading && error) {
-      setSubmitSuccess(false);
-
-      setTimeout(() => {
-        const messageError = document.querySelector(".message-error");
-        if (messageError) {
-          messageError.classList.remove("d-block");
-          messageError.classList.add("d-none");
-        }
-      }, 2000);
+    if (defaultValues) {
+      reset(defaultValues);
     }
+  }, [defaultValues, reset]);
 
-    if (previousLoading && !loading && !error) {
-      setSubmitSuccess(true);
-
-      setTimeout(() => {
-        const modal = document.getElementById(idModal);
-        if (modal) {
-          const bootstrapModal = (window as typeof window & { bootstrap?: { Modal?: { getInstance: (element: Element) => { hide: () => void } | null } } }).bootstrap?.Modal?.getInstance(modal);
-          if (bootstrapModal) {
-            bootstrapModal.hide();
-          }
-          window.location.reload();
-        }
-      }, 2000);
-    }
-
-    setPreviousLoading(loading);
-
-  }, [loading, error, idModal, previousLoading]);
-
+  // Se resetea el formulario cuando se cierra el modal.
   useEffect(() => {
     const modal = document.getElementById(idModal);
     if (modal) {
       const handleHidden = () => {
         reset();
-        setSubmitSuccess(false);
+        setErrorMessage(false);
+        setShowSuccess(false);
       };
 
       modal.addEventListener('hidden.bs.modal', handleHidden);
@@ -76,13 +62,23 @@ export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultVal
     }
   }, [reset, idModal]);
 
+  // Manejar la visibilidad del error
   useEffect(() => {
-    // Solo resetear si los defaultValues realmente cambiaron
-    if (defaultValues && JSON.stringify(defaultValues) !== JSON.stringify(previousDefaultValues.current)) {
-      reset(defaultValues);
-      previousDefaultValues.current = defaultValues;
+    if (error) {
+      setErrorMessage(true);
+      const timer = setTimeout(() => setErrorMessage(false), 2000);
+      return () => clearTimeout(timer);
+    } else {
+      setErrorMessage(false);
     }
-  }, [defaultValues, reset]);
+  }, [error]);
+
+  // Manejar la visibilidad del éxito
+  useEffect(() => {
+    if (success) {
+      setShowSuccess(true);
+    }
+  }, [success]);
 
   return (
     <>
@@ -96,14 +92,14 @@ export const GenericForm = <T extends FieldValues>({ idModal, formId, defaultVal
         </div>
       )}
 
-      {submitSuccess && !loading && !error && (
-        <div className="mt-3 p-2 text-center" style={{ backgroundColor: '#d4edda', color: '#155724', borderRadius: '4px' }}>
-          ¡Registro creado exitosamente!
+      {showSuccess && (
+        <div className="mt-3 p-2 text-center message-success" style={{ backgroundColor: '#d4edda', color: '#155724', borderRadius: '4px' }}>
+          {successMessage}
         </div>
       )}
 
-      {error && !loading && (
-        <div className="mt-3 p-2 text-center d-block message-error" style={{ backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px' }}>
+      {errorMessage && error && (
+        <div className="mt-3 p-2 text-center message-error" style={{ backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px' }}>
           {error.message}
         </div>
       )}

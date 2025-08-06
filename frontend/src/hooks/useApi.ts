@@ -52,8 +52,6 @@ export const useApi = <TRequest = unknown, TResponse = unknown>({ id, url, metho
 
       const jsonData: TResponse = await response.json();
 
-      console.log('jsonData', jsonData)
-
       if (!response.ok) {
         // Intentamos acceder al mensaje de error si TResponse tiene la estructura esperada
         const errorMessage = "Error: " + (jsonData as BaseBackendResponse)?.message || `Error ${response.status}: ${response.statusText}`;
@@ -66,9 +64,10 @@ export const useApi = <TRequest = unknown, TResponse = unknown>({ id, url, metho
       return jsonData;
     } catch (error) {
       if (error instanceof Error && error.name !== 'AbortError') {
+        const errorMessage = "Ocurrió un error al realizar la petición.";
         setLoading(false);
         setData(null);
-        setError(error);
+        setError(new Error(errorMessage));
       }
     } finally {
       setLoading(false);

@@ -7,4 +7,3 @@ export * from "./table/table.tsx";
 export * from "./section/section.tsx";
 export * from "./modal/modalPost.tsx";
 export * from "./loading/loading.tsx";
-export * from "./pack/pack.tsx";

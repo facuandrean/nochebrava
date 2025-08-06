@@ -16,9 +16,24 @@ interface FormCategoryProps {
   apiError: Error | null;
   mode: "create" | "edit" | "delete";
   initialValues?: CategoryRequest;
+  success?: boolean;
+  successMessage?: string;
 }
 
-export const FormCategory = ({ idModal, formId, onSubmit, apiLoading, apiError, mode, initialValues }: FormCategoryProps) => {
+export const FormCategory = ({
+  idModal,
+  formId,
+  onSubmit,
+  apiLoading,
+  apiError,
+  mode,
+  initialValues,
+  success,
+  successMessage
+}: FormCategoryProps) => {
+
+  console.log('initialValues', initialValues)
+
   return (
     <GenericForm<CategoryRequest>
       idModal={idModal}
@@ -27,6 +42,9 @@ export const FormCategory = ({ idModal, formId, onSubmit, apiLoading, apiError, 
       onSubmit={onSubmit}
       loading={apiLoading}
       error={apiError}
+      success={success}
+      successMessage={successMessage}
+      mode={mode}
     >
       {({ control, errors }) => (
         mode === "delete" ? (

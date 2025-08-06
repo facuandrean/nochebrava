@@ -22,7 +22,16 @@ interface TableProps<T extends BaseEntity> {
   onDelete?: (row: T) => void; // función callback para manejar la eliminación
 }
 
-export function Table<T extends BaseEntity>({ columns, data, classNameEspecificTable, dataBsToggle, dataBsTargetEdit, dataBsTargetDelete, onEdit, onDelete }: TableProps<T>) {
+export function Table<T extends BaseEntity>({
+  columns,
+  data,
+  classNameEspecificTable,
+  dataBsToggle,
+  dataBsTargetEdit,
+  dataBsTargetDelete,
+  onEdit,
+  onDelete
+}: TableProps<T>) {
   return (
     <table className={`table table-striped-columns ${classNameEspecificTable}`}>
       <thead className="table-head table-dark">

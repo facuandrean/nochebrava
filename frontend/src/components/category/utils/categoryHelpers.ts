@@ -1,6 +1,11 @@
 import { handleDate } from "../../../utils/date";
 import type { Category, CategoryRequest, ParsedCategory } from "../models";
 
+/**
+ * Parsean los datos de las categorías para mostrarlos en la tabla.
+ * @param categories - Datos de las categorías.
+ * @returns - Datos de las categorías parseados.
+ */
 export const parseCategoryData = (categories: Category[]): ParsedCategory[] => {
   return categories.map((category) => ({
     ...category,
@@ -10,7 +15,11 @@ export const parseCategoryData = (categories: Category[]): ParsedCategory[] => {
   }));
 }
 
-
+/**
+ * Parsean los datos del formulario de creación de categoría para enviarlos a la API.
+ * @param formData - Datos del formulario de creación de categoría.
+ * @returns - Datos del formulario de creación de categoría parseados.
+ */
 export const parseCategoryDataForBackend = (formData: CategoryRequest): Partial<CategoryRequest> => {
   const categoryData: Partial<CategoryRequest> = {};
   if (formData.name) categoryData.name = formData.name;

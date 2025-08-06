@@ -6,6 +6,12 @@ export interface Category {
   updated_at: string;
 }
 
+export interface CategoryResponse {
+  data: Category[];
+  status: string;
+  message: string;
+}
+
 export interface ParsedCategory {
   id: string;
   category_id: string;
