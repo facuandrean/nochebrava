@@ -162,8 +162,6 @@ export const Products = () => {
     }
   }
 
-  if (loading) return <Loading className="loading-container" />;
-
   return (
     <>
       <Section

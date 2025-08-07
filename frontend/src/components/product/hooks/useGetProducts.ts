@@ -13,8 +13,9 @@ import { useApi } from "../../../hooks";
 export const useGetProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [parsedDataProducts, setParsedDataProducts] = useState<ParsedProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { data, loading, error } = useApi<unknown, ProductResponse>({
+  const { data, error } = useApi<unknown, ProductResponse>({
     url: "http://localhost:3000/api/v1/products",
     method: "GET",
     autoFetch: true
@@ -25,8 +26,10 @@ export const useGetProducts = () => {
       const parsedProducts = parseProductData(data.data);
       setProducts(data.data);
       setParsedDataProducts(parsedProducts);
+
+      setIsLoading(false);
     }
   }, [data]);
 
-  return { products, parsedDataProducts, loading, error };
+  return { products, parsedDataProducts, loading: isLoading, error };
 }

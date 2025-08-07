@@ -155,8 +155,6 @@ export const Categories = () => {
     }
   }
 
-  if (loading) return <Loading className="loading-container" />;
-
   return (
     <>
       <Section

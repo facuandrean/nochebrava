@@ -13,8 +13,9 @@ import { parseCategoryData } from "../utils/categoryHelpers";
 export const useGetCategories = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [parsedDataCategories, setParsedDataCategories] = useState<ParsedCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { data, loading, error } = useApi<unknown, CategoryResponse>({
+  const { data, error } = useApi<unknown, CategoryResponse>({
     url: "http://localhost:3000/api/v1/categories",
     method: "GET",
     autoFetch: true
@@ -25,8 +26,10 @@ export const useGetCategories = () => {
       const parsedCategories = parseCategoryData(data.data);
       setCategories(data.data);
       setParsedDataCategories(parsedCategories);
+
+      setIsLoading(false);
     }
   }, [data]);
 
-  return { categories, parsedDataCategories, loading, error };
+  return { categories, parsedDataCategories, loading: isLoading, error };
 }

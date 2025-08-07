@@ -151,7 +151,7 @@ export const PaymentMethod = () => {
     }
   }
 
-  if (loading) return <Loading className="loading-container" />;
+  // if (loading) return <Loading className="loading-container" />;
 
   return (
     <>
