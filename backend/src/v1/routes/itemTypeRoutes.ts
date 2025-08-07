@@ -8,7 +8,7 @@ const itemTypeRouter = Router();
 itemTypeRouter.get("/", itemTypeController.getAllItemTypes);
 itemTypeRouter.get("/:item_type_id", itemTypeController.getItemTypeById);
 itemTypeRouter.post("/", validateBody(false, itemTypeSchema, itemTypeSchema), itemTypeController.postItemType);
-itemTypeRouter.put("/:item_type_id", validateBody(true, itemTypeSchema, itemTypeSchema), itemTypeController.updateItemType);
+itemTypeRouter.patch("/:item_type_id", validateBody(true, itemTypeSchema, itemTypeSchema), itemTypeController.updateItemType);
 itemTypeRouter.delete("/:item_type_id", itemTypeController.deleteItemType);
 
 export default itemTypeRouter;

@@ -15,7 +15,6 @@ export const useDeletePaymentMethod = ({ dataDeletePaymentMethod }: UseDeletePay
   const deletePaymentMethod = async (): Promise<PaymentMethodResponse | undefined> => {
     try {
       const response = await trigger();
-      console.log('responsee', response);
       return response;
     } catch (error) {
       console.log('Ocurrió un error al eliminar el método de pago', error);

@@ -21,15 +21,6 @@ const getAllItemTypes = async (_req: Request, res: Response): Promise<void> => {
     try {
         const itemTypes: ItemType[] = await itemTypeService.getAllItemTypes();
 
-        if (itemTypes.length === 0) {
-            res.status(404).json({
-                status: "Operación exitosa.",
-                message: "No se encontró ningún tipo de item.",
-                data: []
-            });
-            return;
-        }
-
         res.status(200).json({
             status: "Operación exitosa",
             message: "Tipos de items obtenidos correctamente.",

@@ -142,7 +142,6 @@ export const PaymentMethod = () => {
   const onDeleteSubmit = async () => {
     try {
       const response = await deletePaymentMethod();
-      console.log('response', response);
       if (response) {
         handleSuccess("deletePaymentMethodModal");
       }
