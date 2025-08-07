@@ -59,18 +59,28 @@ const getPaymentMethodById = async (payment_method_id: string): Promise<PaymentM
  */
 const postPaymentMethod = async (dataPaymentMethod: PaymentMethodBodyPost): Promise<PaymentMethod> => {
   try {
-    const date = getCurrentDate();
     const newPaymentMethod = {
       payment_method_id: uuid(),
       ...dataPaymentMethod,
-      created_at: date,
-      updated_at: date
     };
 
     const paymentMethod: PaymentMethod = await db.insert(paymentMethods).values(newPaymentMethod).returning().get();
     return paymentMethod;
   } catch (error) {
     throw new AppError("Ocurrió un error al crear el método de pago.", 400, []);
+  }
+}
+
+const patchPaymentMethod = async (payment_method_id: string, dataPaymentMethod: PaymentMethodBodyPost): Promise<PaymentMethod> => {
+  try {
+    const updatedPaymentMethod = {
+      ...dataPaymentMethod,
+    };
+
+    const paymentMethod: PaymentMethod = await db.update(paymentMethods).set(updatedPaymentMethod).where(eq(paymentMethods.payment_method_id, payment_method_id)).returning().get();
+    return paymentMethod;
+  } catch (error) {
+    throw new AppError("Ocurrió un error al actualizar el método de pago.", 400, []);
   }
 }
 
@@ -98,5 +108,6 @@ export const paymentMethodService = {
   getAllPaymentMethods,
   getPaymentMethodById,
   postPaymentMethod,
+  patchPaymentMethod,
   deletePaymentMethod
 }

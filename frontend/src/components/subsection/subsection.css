@@ -1,0 +1,13 @@
+.subsection {
+  margin-top: 1.5rem;
+}
+
+.subsection-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.subsection-description {
+  font-size: 1.15rem;
+  font-weight: 600;
+}

@@ -21,15 +21,6 @@ const getAllPaymentMethods = async (_req: Request, res: Response): Promise<void>
   try {
     const paymentMethods: PaymentMethod[] = await paymentMethodService.getAllPaymentMethods();
 
-    if (paymentMethods.length === 0) {
-      res.status(404).json({
-        status: "Operación exitosa.",
-        message: "No se encontraron métodos de pago.",
-        data: []
-      });
-      return;
-    }
-
     res.status(200).json({
       status: "Operación exitosa.",
       message: "Métodos de pago obtenidos correctamente.",
@@ -155,6 +146,49 @@ const postPaymentMethod = async (req: Request, res: Response): Promise<void> => 
   }
 }
 
+const patchPaymentMethod = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const payment_method_id = req.params.payment_method_id as string;
+    const dataPaymentMethod = req.body as PaymentMethodBodyPost;
+
+    const existsPaymentMethod = await paymentMethodService.getPaymentMethodById(payment_method_id);
+
+    if (!existsPaymentMethod) {
+      res.status(404).json({
+        status: "Operación exitosa.",
+        message: "No se encontró el método de pago.",
+        data: []
+      });
+      return;
+    }
+
+    const paymentMethod: PaymentMethod = await paymentMethodService.patchPaymentMethod(payment_method_id, dataPaymentMethod);
+
+    res.status(200).json({
+      status: "Operación exitosa.",
+      message: "Método de pago actualizado correctamente.",
+      data: paymentMethod
+    });
+    return;
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.status).json({
+        status: "Operación fallida.",
+        message: error.message,
+        data: error.data
+      });
+      return;
+    }
+
+    res.status(500).json({
+      status: "Error interno del servidor.",
+      message: "Ocurrió un error al procesar la solicitud.",
+      data: []
+    });
+    return;
+  }
+}
+
 /**
  * Deletes a payment method from the system by its ID.
  * 
@@ -186,7 +220,7 @@ const deletePaymentMethod = async (req: Request, res: Response): Promise<void> =
 
     await paymentMethodService.deletePaymentMethod(payment_method_id);
 
-    res.status(204).json({
+    res.status(200).json({
       status: "Operación exitosa.",
       message: "Método de pago eliminado correctamente.",
       data: []
@@ -216,5 +250,6 @@ export const paymentMethodController = {
   getAllPaymentMethods,
   getPaymentMethodById,
   postPaymentMethod,
+  patchPaymentMethod,
   deletePaymentMethod
 }
