@@ -150,7 +150,9 @@ export const PaymentMethod = () => {
     }
   }
 
-  // if (loading) return <Loading className="loading-container" />;
+  const onParsingData = (row: ParsedPaymentMethod, accessor: string) => {
+    if (accessor.includes("name")) return <div><span> {row.name} </span></div>
+  }
 
   return (
     <>
@@ -184,6 +186,7 @@ export const PaymentMethod = () => {
                 dataBsTargetDelete="#deletePaymentMethodModal"
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onParsingData={onParsingData}
               />
             )
           })()}

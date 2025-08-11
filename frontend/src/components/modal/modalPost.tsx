@@ -11,11 +11,10 @@ interface ModalPostProps {
   // Estas propiedades son para wizards.
   step?: number;
   onCancel?: () => void;
-  onSubmit?: () => void;
-  onFinish?: () => void;
+  onFinish?: () => void; // Solo debo recibirlo si el componente es un wizard. Se ejecutaría en el segundo paso.
 }
 
-export const ModalPost = ({ id, title, formId, loading = false, children, step, onCancel, onSubmit, onFinish }: ModalPostProps) => {
+export const ModalPost = ({ id, title, formId, loading = false, children, step, onCancel, onFinish }: ModalPostProps) => {
   return (
     <>
       <div className="modal fade" id={id} aria-hidden="true" aria-labelledby={`${id}Label`} tabIndex={-1}>
@@ -38,9 +37,7 @@ export const ModalPost = ({ id, title, formId, loading = false, children, step, 
                 className="btn btn-success"
                 disabled={loading}
                 onClick={() => {
-                  if (step === 1) {
-                    onSubmit?.();
-                  } else {
+                  if (step === 2) {
                     onFinish?.();
                   }
                 }}

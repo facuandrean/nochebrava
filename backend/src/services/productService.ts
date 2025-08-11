@@ -2,9 +2,11 @@ import { eq } from "drizzle-orm";
 import { db } from "../database/database";
 import { products } from "../database/db/productScheme";
 import { AppError } from "../errors";
-import type { Product, ProductBodyPost, ProductBodyUpdate } from "../types/types";
+import type { Category, Product, ProductBodyPost, ProductBodyUpdate } from "../types/types";
 import { getCurrentDate } from "../utils/date";
 import { v4 as uuid } from "uuid";
+import { productCategories } from "../database/db/productCategoryScheme";
+import { categories } from "../database/db/categoryScheme";
 
 /**
  * Retrieves all products from the database.
@@ -16,10 +18,63 @@ import { v4 as uuid } from "uuid";
  * 
  * @throws {AppError} When a database error occurs during the query
  */
-const getProducts = async (): Promise<Product[]> => {
+const getProducts = async (): Promise<(Product & { categories: Category[] })[]> => {
   try {
-    const allProducts: Product[] = await db.select().from(products).all();
-    return allProducts;
+    const allProducts = await db.select({
+      // Campos del producto
+      product_id: products.product_id,
+      name: products.name,
+      description: products.description,
+      price: products.price,
+      stock: products.stock,
+      picture: products.picture,
+      active: products.active,
+      created_at: products.created_at,
+      updated_at: products.updated_at,
+      // Campos de la categoría
+      category_id: categories.category_id,
+      category_name: categories.name,
+      category_description: categories.description,
+      category_created_at: categories.created_at,
+      category_updated_at: categories.updated_at
+    }).from(products)
+      .leftJoin(productCategories, eq(products.product_id, productCategories.product_id))
+      .leftJoin(categories, eq(productCategories.category_id, categories.category_id))
+      .all();
+
+    const productsMap = new Map<string, Product & { categories: Category[] }>();
+
+    for (const row of allProducts) {
+      const productId = row.product_id;
+
+      if (!productsMap.has(productId)) {
+        productsMap.set(productId, {
+          product_id: row.product_id,
+          name: row.name,
+          description: row.description,
+          price: row.price,
+          stock: row.stock,
+          picture: row.picture,
+          active: row.active,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+          categories: []
+        })
+      }
+
+      if (row.category_id) {
+        const product = productsMap.get(productId)!;
+        product.categories.push({
+          category_id: row.category_id,
+          name: row.category_name || '',
+          description: row.category_description || '',
+          created_at: row.category_created_at || '',
+          updated_at: row.category_updated_at || ''
+        })
+      }
+    }
+
+    return Array.from(productsMap.values());
   } catch (error) {
     throw new AppError('Ocurrió un error al obtener los productos.', 400, []);
   }

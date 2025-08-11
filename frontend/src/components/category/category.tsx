@@ -155,6 +155,14 @@ export const Categories = () => {
     }
   }
 
+
+  const onParsingData = (row: ParsedCategory, accessor: string) => {
+    if (accessor.includes("name")) return <div><span> {row.name} </span></div>
+    if (accessor.includes("description")) return <div><span> {row.description} </span></div>
+    if (accessor.includes("created_at")) return <div><span> {row.created_at} </span></div>
+    if (accessor.includes("updated_at")) return <div><span> {row.updated_at} </span></div>
+  }
+
   return (
     <>
       <Section
@@ -184,6 +192,7 @@ export const Categories = () => {
                 dataBsToggle="modal"
                 dataBsTargetEdit="#editCategoryModal"
                 dataBsTargetDelete="#deleteCategoryModal"
+                onParsingData={onParsingData}
                 onEdit={onEdit}
                 onDelete={onDelete}
               />

@@ -1,0 +1,14 @@
+.table-body-categories {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+}
+
+.table-body-categories span {
+  margin-bottom: .5rem;
+}
+
+.table-body-categories span:last-child {
+  margin-bottom: 0;
+}

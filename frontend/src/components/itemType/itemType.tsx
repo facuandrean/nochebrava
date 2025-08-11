@@ -150,6 +150,10 @@ export const ItemType = () => {
     }
   }
 
+  const onParsingData = (row: ParsedItemType, accessor: string) => {
+    if (accessor.includes("name")) return <div><span> {row.name} </span></div>
+  }
+
   return (
     <>
       <Subsection
@@ -182,6 +186,7 @@ export const ItemType = () => {
                 dataBsTargetDelete="#deleteItemTypeModal"
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onParsingData={onParsingData}
               />
             )
           })()}

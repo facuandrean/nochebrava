@@ -12,7 +12,11 @@ import { FormProduct } from "./components/formProduct";
 import { useEffect, useState } from "react";
 import { ModalDelete } from "../modal/modalDelete";
 import { Filter } from "../filter";
-import { useDeleteProducts, useGetProducts, usePatchProducts, usePostProducts } from "./hooks";
+import { useDeleteProducts, useGetProducts, usePatchProducts, usePostProductCategories, usePostProducts } from "./hooks";
+import { FormProductCategories } from "./components/formProductCategories";
+import { useGetCategories } from "../category/hooks";
+import { useWizard } from "../../hooks";
+import { Wizard } from "../wizard";
 
 const columns: Column<ParsedProduct>[] = [
   { header: "N°", accessor: "product_id" },
@@ -21,6 +25,7 @@ const columns: Column<ParsedProduct>[] = [
   { header: "Precio", accessor: "price" },
   { header: "Stock", accessor: "stock" },
   { header: "Activo", accessor: "active" },
+  { header: "Categorías", accessor: "categories" },
   { header: "Creado", accessor: "created_at" },
   { header: "Actualizado", accessor: "updated_at" }
 ];
@@ -33,10 +38,17 @@ export const Products = () => {
 
   const [successState, setSuccessState] = useState(false);
 
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [productFormData, setProductFormData] = useState<ProductRequest | null>(null);
+  const { postProductCategories, loading: apiLoadingPostCategories, error: apiErrorPostCategories } = usePostProductCategories();
+
   const { products, parsedDataProducts, loading, error } = useGetProducts();
   const { postProduct, loading: apiLoadingPost, error: apiErrorPost } = usePostProducts();
   const { patchProduct, loading: apiLoadingPatch, error: apiErrorPatch } = usePatchProducts({ dataEditProduct });
   const { deleteProduct, loading: apiDeleteLoading, error: apiDeleteError } = useDeleteProducts({ dataDeleteProduct });
+
+  const { parsedDataCategories, loading: loadingCategories, error: errorCategories } = useGetCategories();
+  const wizard = useWizard(2);
 
   /**
    * Se ejecuta cuando se cargan los productos y se setean en el estado filteredDataProducts.
@@ -78,6 +90,7 @@ export const Products = () => {
         bootstrapModal?.hide();
       }
 
+      resetWizard();
       window.location.reload();
     }, 2000);
   }
@@ -88,15 +101,9 @@ export const Products = () => {
    * Es de tipo ProductRequest porque es el tipo de datos que se envía a la API.
    * @param formData - Datos del formulario de creación de producto.
    */
-  const onSubmit: SubmitHandler<ProductRequest> = async (formData: ProductRequest) => {
-    try {
-      const response = await postProduct(formData);
-      if (response) {
-        handleSuccess("createProductModal");
-      }
-    } catch (error) {
-      console.log('Error al crear el producto', error);
-    }
+  const onNextStep: SubmitHandler<ProductRequest> = async (formData: ProductRequest) => {
+    setProductFormData(formData);
+    wizard.handleNext();
   };
 
   /**
@@ -162,6 +169,76 @@ export const Products = () => {
     }
   }
 
+  const onParsingData = (row: ParsedProduct, accessor: string) => {
+    if (accessor.includes("name")) return <div><span> {row.name} </span></div>
+    if (accessor.includes("description")) return <div>{row.description ? <span> {row.description} </span> : <span className="text-muted"> Sin descripción </span>}</div>
+    if (accessor.includes("price")) return <div><span> {row.price} </span></div>
+    if (accessor.includes("stock")) return <div><span> {row.stock} </span></div>
+    if (accessor.includes("active")) return <div><span> {row.active} </span></div>
+    if (accessor.includes("created_at")) return <div><span> {row.created_at} </span></div>
+    if (accessor.includes("updated_at")) return <div><span> {row.updated_at} </span></div>
+    if (accessor.includes("categories")) {
+      return (
+        <div className="table-body-categories">
+          {row.categories.length > 0 ? (
+            row.categories.map((category) => (
+              <span key={category.category_id}> {category.name} </span>
+            ))
+          ) : (
+            <span className="text-muted"> Sin categorías </span>
+          )}
+        </div>
+      )
+    }
+  }
+
+  const onCategoryChange = (categoryIds: string[]) => {
+    setSelectedCategories(categoryIds);
+  }
+
+  const resetWizard = () => {
+    setProductFormData(null);
+    setSelectedCategories([]);
+    wizard.resetWizard();
+  }
+
+  const onWizardFinish = async () => {
+    if (!productFormData) {
+      console.error("No hay datos del formulario para enviar");
+      return;
+    }
+
+    try {
+      const productResponse = await postProduct(productFormData);
+
+      if (!productResponse) {
+        throw new Error("Error al crear el producto");
+      }
+
+      const createdProduct = productResponse.data[0];
+      console.log('productResponse', createdProduct.product_id);
+
+      if (selectedCategories.length > 0) {
+        const productCategoryResponse = await postProductCategories(
+          createdProduct.product_id,
+          selectedCategories
+        );
+
+        if (!productCategoryResponse) {
+          throw new Error("Error al crear las categorías del producto");
+        }
+      }
+
+      handleSuccess("createProductModal");
+    } catch (error) {
+      console.error("Error al crear el producto", error);
+    }
+  }
+
+  const onWizardCancel = () => {
+    resetWizard();
+  }
+
   return (
     <>
       <Section
@@ -191,6 +268,7 @@ export const Products = () => {
                 dataBsToggle="modal"
                 dataBsTargetEdit="#editProductModal"
                 dataBsTargetDelete="#deleteProductModal"
+                onParsingData={onParsingData}
                 onEdit={onEdit}
                 onDelete={onDelete}
               />
@@ -200,6 +278,44 @@ export const Products = () => {
       </Section>
 
       <ModalPost
+        id="createProductModal"
+        title="Crear producto"
+        formId={wizard.currentStep === 1 ? "createProductForm" : "createProductCategoriesForm"}
+        loading={apiLoadingPost}
+        step={wizard.currentStep}
+        onCancel={onWizardCancel}
+        onFinish={onWizardFinish}
+      >
+        <Wizard currentStep={wizard.currentStep}>
+
+          <FormProduct
+            idModal="createProductModal"
+            formId="createProductForm"
+            onSubmit={onNextStep}
+            apiLoading={apiLoadingPost}
+            apiError={apiErrorPost}
+            mode="create"
+            success={successState}
+            successMessage="¡Producto creado exitosamente!"
+          />
+
+          <FormProductCategories
+            parsedCategories={parsedDataCategories}
+            loadingCategories={loadingCategories}
+            errorCategories={errorCategories}
+            selectedCategoryIds={selectedCategories}
+            onCategoryChange={onCategoryChange}
+
+            successState={successState}
+            successMessage="¡Producto creado exitosamente!"
+            apiLoading={apiLoadingPostCategories}
+            apiError={apiErrorPostCategories}
+          />
+
+        </Wizard>
+      </ModalPost>
+
+      {/* <ModalPost
         id="createProductModal"
         title="Crear producto"
         formId="createProductForm"
@@ -216,7 +332,7 @@ export const Products = () => {
           successMessage="¡Producto creado exitosamente!"
         />
 
-      </ModalPost>
+      </ModalPost> */}
 
       <ModalEdit
         id="editProductModal"

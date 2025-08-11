@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { productService } from "../services/productService";
 import type { Product, ProductBodyPost, ProductBodyUpdate } from "../types/types";
 import { AppError } from "../errors";
+import { cosineDistance } from "drizzle-orm";
 
 /**
  * Retrieves all products available in the system.
@@ -126,7 +127,7 @@ const postProduct = async (req: Request, res: Response): Promise<void> => {
     res.status(201).json({
       status: 'Operación exitosa',
       message: 'Producto creado correctamente.',
-      data: product
+      data: [product]
     });
 
     return;

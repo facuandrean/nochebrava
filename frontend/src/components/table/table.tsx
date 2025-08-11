@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { ButtonIcon } from "../button/buttonIcon";
 import "./table.css";
 
@@ -18,6 +19,7 @@ interface TableProps<T extends BaseEntity> {
   dataBsToggle?: string;
   dataBsTargetEdit?: string;
   dataBsTargetDelete?: string;
+  onParsingData: (row: T, accessor: string) => ReactNode; // función callback para manejar la edición
   onEdit?: (row: T) => void; // función callback para manejar la edición
   onDelete?: (row: T) => void; // función callback para manejar la eliminación
 }
@@ -29,9 +31,11 @@ export function Table<T extends BaseEntity>({
   dataBsToggle,
   dataBsTargetEdit,
   dataBsTargetDelete,
+  onParsingData,
   onEdit,
   onDelete
 }: TableProps<T>) {
+
   return (
     <table className={`table table-striped-columns ${classNameEspecificTable}`}>
       <thead className="table-head table-dark">
@@ -47,22 +51,23 @@ export function Table<T extends BaseEntity>({
           <tr key={i}>
             {columns.map((col) => (
               <td key={String(col.accessor)}>
-                <div>
-                  <span>
-                    {String(col.accessor).includes("_id")
+                {String(col.accessor).includes("_id") ? <div>{i + 1}</div> : onParsingData(row, String(col.accessor))}
+                {/* {String(col.accessor).includes("_id")
                       ? i + 1
                       : String(col.accessor).includes("description") && row[col.accessor] === null || row[col.accessor] === ""
                         ? <span className="text-muted">Sin descripción</span>
-                        : Array.isArray(row[col.accessor])
+                        : Array.isArray(row[col.accessor] && String(col.accessor).includes("categories"))
                           ? (row[col.accessor] as Array<Record<string, unknown>>).map((item, index) => (
+                            // Esta porción de código era para mostrar los items de un pack
+                            // <div key={index} className="mb-1">
+                            //   {String(item.quantity) + " " + String(item.product_name)}
+                            // </div>
                             <div key={index} className="mb-1">
-                              {String(item.quantity) + " " + String(item.product_name)}
+                              <span> {item.name} </span>
                             </div>
                           ))
                           : String(row[col.accessor])
-                    }
-                  </span>
-                </div>
+                    } */}
               </td>
             ))}
             <td>
