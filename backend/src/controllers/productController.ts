@@ -2,7 +2,6 @@ import type { Request, Response } from "express";
 import { productService } from "../services/productService";
 import type { Product, ProductBodyPost, ProductBodyUpdate } from "../types/types";
 import { AppError } from "../errors";
-import { cosineDistance } from "drizzle-orm";
 
 /**
  * Retrieves all products available in the system.

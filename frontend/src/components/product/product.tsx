@@ -58,6 +58,37 @@ export const Products = () => {
     setFilteredDataProducts(parsedDataProducts);
   }, [parsedDataProducts]);
 
+
+  /**
+   * Parsea los datos del producto para mostrar en la tabla.
+   * @param row - Datos del producto.
+   * @param accessor - Accesor del dato.
+   * @returns - Datos del producto parseados.
+   */
+  const onParsingData = (row: ParsedProduct, accessor: string) => {
+    if (accessor.includes("name")) return <div><span> {row.name} </span></div>
+    if (accessor.includes("description")) return <div>{row.description ? <span> {row.description} </span> : <span className="text-muted"> Sin descripción </span>}</div>
+    if (accessor.includes("price")) return <div><span> {row.price} </span></div>
+    if (accessor.includes("stock")) return <div><span> {row.stock} </span></div>
+    if (accessor.includes("active")) return <div><span> {row.active} </span></div>
+    if (accessor.includes("created_at")) return <div><span> {row.created_at} </span></div>
+    if (accessor.includes("updated_at")) return <div><span> {row.updated_at} </span></div>
+    if (accessor.includes("categories")) {
+      return (
+        <div className="table-body-categories">
+          {row.categories.length > 0 ? (
+            row.categories.map((category) => (
+              <span key={category.category_id}> {category.name} </span>
+            ))
+          ) : (
+            <span className="text-muted"> Sin categorías </span>
+          )}
+        </div>
+      )
+    }
+  }
+
+
   /**
    * Se ejecuta cuando se cambia el texto de búsqueda en el input del filtro.
    * Se filtra la información de parsedDataProducts y se setea en el estado filteredDataProducts.
@@ -73,6 +104,7 @@ export const Products = () => {
     );
     setFilteredDataProducts(filtered);
   };
+
 
   /**
    * Se ejecuta cuando se crea un producto exitosamente.
@@ -95,6 +127,7 @@ export const Products = () => {
     }, 2000);
   }
 
+
   /**
    * Se ejecuta cuando se envía el formulario de creación de producto.
    * Se parsean los datos del formulario y se envían a la API.
@@ -106,6 +139,7 @@ export const Products = () => {
     wizard.handleNext();
   };
 
+
   /**
    * Se ejecuta cuando se hace click en el botón de edición de un producto.
    * Se setea el estado dataEditProduct con los datos del producto.
@@ -115,6 +149,7 @@ export const Products = () => {
   const onEdit = (row: ParsedProduct) => {
     setDataEditProduct(row);
   }
+
 
   /**
    * Se ejecuta cuando se envía el formulario de edición de producto.
@@ -143,6 +178,7 @@ export const Products = () => {
     }
   }
 
+
   /**
    * Se ejecuta cuando se hace click en el botón de eliminación de un producto.
    * Se setea el estado dataDeleteProduct con los datos del producto.
@@ -151,6 +187,7 @@ export const Products = () => {
   const onDelete = async (row: ParsedProduct) => {
     setDataDeleteProduct(row);
   }
+
 
   /**
    * Se ejecuta cuando se envía el formulario de eliminación de producto.
@@ -169,39 +206,30 @@ export const Products = () => {
     }
   }
 
-  const onParsingData = (row: ParsedProduct, accessor: string) => {
-    if (accessor.includes("name")) return <div><span> {row.name} </span></div>
-    if (accessor.includes("description")) return <div>{row.description ? <span> {row.description} </span> : <span className="text-muted"> Sin descripción </span>}</div>
-    if (accessor.includes("price")) return <div><span> {row.price} </span></div>
-    if (accessor.includes("stock")) return <div><span> {row.stock} </span></div>
-    if (accessor.includes("active")) return <div><span> {row.active} </span></div>
-    if (accessor.includes("created_at")) return <div><span> {row.created_at} </span></div>
-    if (accessor.includes("updated_at")) return <div><span> {row.updated_at} </span></div>
-    if (accessor.includes("categories")) {
-      return (
-        <div className="table-body-categories">
-          {row.categories.length > 0 ? (
-            row.categories.map((category) => (
-              <span key={category.category_id}> {category.name} </span>
-            ))
-          ) : (
-            <span className="text-muted"> Sin categorías </span>
-          )}
-        </div>
-      )
-    }
-  }
-
+  /**
+   * Se ejecuta cuando se cambia el estado de las categorías seleccionadas.
+   * Se setea el estado selectedCategories con los ids de las categorías seleccionadas.
+   * @param categoryIds - Ids de las categorías seleccionadas.
+   */
   const onCategoryChange = (categoryIds: string[]) => {
     setSelectedCategories(categoryIds);
   }
 
+
+  /**
+   * Se ejecuta cuando se resetea el wizard.
+   * Se setean los estados productFormData, selectedCategories y se resetea el wizard.
+   */
   const resetWizard = () => {
     setProductFormData(null);
     setSelectedCategories([]);
     wizard.resetWizard();
   }
 
+  /**
+   * Se ejecuta cuando se finaliza el wizard.
+   * Se envía el formulario de creación de producto y se envían las categorías del producto.
+   */
   const onWizardFinish = async () => {
     if (!productFormData) {
       console.error("No hay datos del formulario para enviar");
@@ -216,9 +244,9 @@ export const Products = () => {
       }
 
       const createdProduct = productResponse.data[0];
-      console.log('productResponse', createdProduct.product_id);
 
       if (selectedCategories.length > 0) {
+
         const productCategoryResponse = await postProductCategories(
           createdProduct.product_id,
           selectedCategories
@@ -229,12 +257,16 @@ export const Products = () => {
         }
       }
 
-      handleSuccess("createProductModal");
+      // handleSuccess("createProductModal");
     } catch (error) {
       console.error("Error al crear el producto", error);
     }
   }
 
+  /**
+   * Se ejecuta cuando se cancela el wizard.
+   * Se resetea el wizard.
+   */
   const onWizardCancel = () => {
     resetWizard();
   }
@@ -297,6 +329,7 @@ export const Products = () => {
             mode="create"
             success={successState}
             successMessage="¡Producto creado exitosamente!"
+            initialValues={productFormData || undefined}
           />
 
           <FormProductCategories
@@ -310,6 +343,8 @@ export const Products = () => {
             successMessage="¡Producto creado exitosamente!"
             apiLoading={apiLoadingPostCategories}
             apiError={apiErrorPostCategories}
+
+            onPreviousStep={wizard.handlePrevious}
           />
 
         </Wizard>

@@ -12,7 +12,8 @@ export const parseProductData = (products: Product[]): ParsedProduct[] => {
     id: product.product_id,
     active: product.active ? "Si" : "No",
     created_at: handleDate(product.created_at),
-    updated_at: handleDate(product.updated_at)
+    updated_at: handleDate(product.updated_at),
+    categories: product.categories || []
   }));
 };
 
