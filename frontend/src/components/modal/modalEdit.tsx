@@ -11,11 +11,10 @@ interface ModalEditProps {
   // Estas propiedades son para wizards.
   step?: number;
   onCancel?: () => void;
-  onSubmit?: () => void;
   onFinish?: () => void;
 }
 
-export const ModalEdit = ({ id, title, formId, loading = false, children, step, onCancel, onSubmit, onFinish }: ModalEditProps) => {
+export const ModalEdit = ({ id, title, formId, loading = false, children, step, onCancel, onFinish }: ModalEditProps) => {
   return (
     <>
       <div className="modal fade" id={id} aria-hidden="true" aria-labelledby={`${id}Label`} tabIndex={-1}>
@@ -38,14 +37,12 @@ export const ModalEdit = ({ id, title, formId, loading = false, children, step, 
                 className="btn btn-success"
                 disabled={loading}
                 onClick={() => {
-                  if (step === 1) {
-                    onSubmit?.();
-                  } else {
+                  if (step === 2) {
                     onFinish?.();
                   }
                 }}
               >
-                {loading ? "Actualizando..." : "Actualizar"}
+                {loading ? "Guardando..." : (step === 1 ? "Avanzar" : "Guardar")}
               </button>
             </div>
           </div>

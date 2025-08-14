@@ -30,7 +30,7 @@ export interface ProductRequest {
   description: string | null;
   price: number;
   stock: number;
-  active: boolean;
+  active: boolean | string;
 }
 
 export interface ProductResponse {

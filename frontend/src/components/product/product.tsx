@@ -17,6 +17,7 @@ import { FormProductCategories } from "./components/formProductCategories";
 import { useGetCategories } from "../category/hooks";
 import { useWizard } from "../../hooks";
 import { Wizard } from "../wizard";
+import { parseProductDataForBackend } from "./utils/productHelpers";
 
 const columns: Column<ParsedProduct>[] = [
   { header: "N°", accessor: "product_id" },
@@ -40,11 +41,12 @@ export const Products = () => {
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [productFormData, setProductFormData] = useState<ProductRequest | null>(null);
+  const [productUpdateData, setProductUpdateData] = useState<ProductRequest | null>(null);
   const { postProductCategories, loading: apiLoadingPostCategories, error: apiErrorPostCategories } = usePostProductCategories();
 
   const { products, parsedDataProducts, loading, error } = useGetProducts();
   const { postProduct, loading: apiLoadingPost, error: apiErrorPost } = usePostProducts();
-  const { patchProduct, loading: apiLoadingPatch, error: apiErrorPatch } = usePatchProducts({ dataEditProduct });
+  const { patchProduct, loading: apiLoadingPatch, error: apiErrorPatch } = usePatchProducts({ dataEditProduct }); // acá no debería recibir el dataEditProduct directamente, primero debería de parsearlo a un ParsedProduct. por eso da error.
   const { deleteProduct, loading: apiDeleteLoading, error: apiDeleteError } = useDeleteProducts({ dataDeleteProduct });
 
   const { parsedDataCategories, loading: loadingCategories, error: errorCategories } = useGetCategories();
@@ -159,20 +161,24 @@ export const Products = () => {
    */
   const onEditSubmit: SubmitHandler<ProductRequest> = async (formData: ProductRequest) => {
     try {
-      setDataEditProduct(prev => prev ? {
-        ...prev,
-        name: formData.name,
-        description: formData.description,
-        price: formData.price,
-        stock: formData.stock,
-        active: formData.active ? "Si" : "No"
-      } : null);
+      const parsedData = parseProductDataForBackend(formData);
 
-      const response = await patchProduct(formData);
+      // Se crea un ProductRequest completo combinando formData original con datos parseados
+      const productUpdateData: ProductRequest = {
+        name: parsedData.name || formData.name,
+        description: parsedData.description !== undefined ? parsedData.description : formData.description,
+        price: parsedData.price !== undefined ? parsedData.price : formData.price,
+        stock: parsedData.stock !== undefined ? parsedData.stock : formData.stock,
+        active: parsedData.active !== undefined && parsedData.active === true ? "Si" : "No"
+      };
 
-      if (response) {
-        handleSuccess("editProductModal");
-      }
+      setProductUpdateData(productUpdateData);
+
+      console.log('productUpdateData', productUpdateData);
+
+      console.log('dataEditProduct', dataEditProduct);
+
+      wizard.handleNext();
     } catch (error) {
       console.log('Error al actualizar el producto', error)
     }
@@ -230,7 +236,7 @@ export const Products = () => {
    * Se ejecuta cuando se finaliza el wizard.
    * Se envía el formulario de creación de producto y se envían las categorías del producto.
    */
-  const onWizardFinish = async () => {
+  const onWizardFinishPost = async () => {
     if (!productFormData) {
       console.error("No hay datos del formulario para enviar");
       return;
@@ -257,9 +263,30 @@ export const Products = () => {
         }
       }
 
-      // handleSuccess("createProductModal");
+      handleSuccess("createProductModal");
     } catch (error) {
       console.error("Error al crear el producto", error);
+    }
+  }
+
+  const onWizardFinishEdit = async () => {
+    if (!productUpdateData) return;
+    try {
+      const productResponse = await patchProduct(productUpdateData);
+      if (!productResponse) throw new Error("Error al actualizar el producto");
+
+      // const createdProduct = productResponse.data[0];
+      // if (selectedCategories.length > 0) {
+      //   const productCategoryResponse = await postProductCategories(
+      //     createdProduct.product_id,
+      //     selectedCategories
+      //   );
+      //   if (!productCategoryResponse) throw new Error("Error al crear las categorías del producto");
+      // }
+
+      // handleSuccess("editProductModal");
+    } catch (error) {
+      console.log('Error al actualizar el producto', error);
     }
   }
 
@@ -316,7 +343,7 @@ export const Products = () => {
         loading={apiLoadingPost}
         step={wizard.currentStep}
         onCancel={onWizardCancel}
-        onFinish={onWizardFinish}
+        onFinish={onWizardFinishPost}
       >
         <Wizard currentStep={wizard.currentStep}>
 
@@ -350,26 +377,57 @@ export const Products = () => {
         </Wizard>
       </ModalPost>
 
-      {/* <ModalPost
-        id="createProductModal"
-        title="Crear producto"
-        formId="createProductForm"
-        loading={apiLoadingPost}>
-
-        <FormProduct
-          idModal="createProductModal"
-          formId="createProductForm"
-          onSubmit={onSubmit}
-          apiLoading={apiLoadingPost}
-          apiError={apiErrorPost}
-          mode="create"
-          success={successState}
-          successMessage="¡Producto creado exitosamente!"
-        />
-
-      </ModalPost> */}
-
       <ModalEdit
+        id="editProductModal"
+        title="Editar producto"
+        formId={wizard.currentStep === 1 ? "editProductForm" : "editProductCategoriesForm"}
+        loading={apiLoadingPatch}
+        step={wizard.currentStep}
+        onCancel={onWizardCancel}
+        onFinish={onWizardFinishEdit}
+      >
+
+        <Wizard currentStep={wizard.currentStep}>
+
+          <FormProduct
+            idModal="editProductModal"
+            formId="editProductForm"
+            onSubmit={onEditSubmit}
+            apiLoading={apiLoadingPatch}
+            apiError={apiErrorPatch}
+            mode="edit"
+            success={successState}
+            successMessage="¡Producto actualizado exitosamente!"
+            initialValues={productUpdateData ? {
+              name: productUpdateData.name,
+              description: productUpdateData.description,
+              price: productUpdateData.price,
+              stock: productUpdateData.stock,
+              active: productUpdateData.active === "Si" ? true : false
+            } : undefined}
+          />
+
+          <FormProductCategories
+            parsedCategories={parsedDataCategories}
+            loadingCategories={loadingCategories}
+            errorCategories={errorCategories}
+            selectedCategoryIds={selectedCategories}
+            onCategoryChange={onCategoryChange}
+
+            successState={successState}
+            successMessage="¡Producto actualizado exitosamente!"
+            apiLoading={apiLoadingPostCategories}
+            apiError={apiErrorPostCategories}
+
+            onPreviousStep={wizard.handlePrevious}
+
+            initialValues={dataEditProduct || undefined} // TODO: Debo pasarle dataEditProduct porque es quien tiene los datos de las categorías seleccionadas del registro que se va a editar, el problema es que espera un tipo de Product y le estoy enviando un ParsedProduct. Una vez que le pase un tipo Product, debo hacer que se carguen las categorías seleccionadas que tenga el registro en este componente.
+          />
+        </Wizard>
+
+      </ModalEdit>
+
+      {/* <ModalEdit
         id="editProductModal"
         title="Editar producto"
         formId="editProductForm"
@@ -393,7 +451,7 @@ export const Products = () => {
           } : undefined}
         />
 
-      </ModalEdit>
+      </ModalEdit> */}
 
       <ModalDelete
         id="deleteProductModal"

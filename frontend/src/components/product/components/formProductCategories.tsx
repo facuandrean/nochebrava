@@ -1,6 +1,7 @@
 import { Loading } from "../../loading/loading";
 import type { ParsedCategory } from "../../category/models";
 import { useEffect, useState } from "react";
+import type { Product } from "../models";
 
 interface FormProductCategoriesProps {
   parsedCategories: ParsedCategory[];
@@ -13,12 +14,15 @@ interface FormProductCategoriesProps {
   apiLoading: boolean;
   apiError: Error | null;
   onPreviousStep: () => void;
+  initialValues?: Product | undefined;
 }
 
-export const FormProductCategories = ({ parsedCategories, loadingCategories, errorCategories, selectedCategoryIds, onCategoryChange, successState, successMessage, apiLoading, apiError, onPreviousStep }: FormProductCategoriesProps) => {
+export const FormProductCategories = ({ parsedCategories, loadingCategories, errorCategories, selectedCategoryIds, onCategoryChange, successState, successMessage, apiLoading, apiError, onPreviousStep, initialValues }: FormProductCategoriesProps) => {
 
   const [errorMessage, setErrorMessage] = useState<boolean>(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  console.log('initialValues', initialValues);
 
   /**
    * Se ejecuta cuando se cambia el estado de un checkbox. Si es true, se agrega la categoría al array de categorías seleccionadas. Si es false, se elimina la categoría del array de categorías seleccionadas.
