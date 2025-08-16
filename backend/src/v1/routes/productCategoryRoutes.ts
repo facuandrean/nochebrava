@@ -13,6 +13,6 @@ productCategoryRouter.delete("/product/:product_id/category/:category_id", produ
 
 // Nuevas rutas batch
 productCategoryRouter.post("/batch", validateBody(false, productCategoriesBatchPutSchema, productCategoriesBatchPostSchema), productCategoryController.assignMultipleCategoriesToProduct);
-productCategoryRouter.put("/product/:product_id/categories", validateBody(true, productCategoriesBatchPutSchema, productCategoriesBatchPostSchema), productCategoryController.replaceProductCategories);
+productCategoryRouter.patch("/product/:product_id/categories", validateBody(true, productCategoriesBatchPutSchema, productCategoriesBatchPostSchema), productCategoryController.replaceProductCategories);
 
 export default productCategoryRouter;

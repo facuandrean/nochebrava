@@ -1,7 +1,6 @@
 import { Loading } from "../../loading/loading";
 import type { ParsedCategory } from "../../category/models";
 import { useEffect, useState } from "react";
-import type { Product } from "../models";
 
 interface FormProductCategoriesProps {
   parsedCategories: ParsedCategory[];
@@ -14,15 +13,12 @@ interface FormProductCategoriesProps {
   apiLoading: boolean;
   apiError: Error | null;
   onPreviousStep: () => void;
-  initialValues?: Product | undefined;
 }
 
-export const FormProductCategories = ({ parsedCategories, loadingCategories, errorCategories, selectedCategoryIds, onCategoryChange, successState, successMessage, apiLoading, apiError, onPreviousStep, initialValues }: FormProductCategoriesProps) => {
+export const FormProductCategories = ({ parsedCategories, loadingCategories, errorCategories, selectedCategoryIds, onCategoryChange, successState, successMessage, apiLoading, apiError, onPreviousStep }: FormProductCategoriesProps) => {
 
   const [errorMessage, setErrorMessage] = useState<boolean>(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
-  console.log('initialValues', initialValues);
 
   /**
    * Se ejecuta cuando se cambia el estado de un checkbox. Si es true, se agrega la categoría al array de categorías seleccionadas. Si es false, se elimina la categoría del array de categorías seleccionadas.
@@ -39,9 +35,9 @@ export const FormProductCategories = ({ parsedCategories, loadingCategories, err
 
 
   /**
-   * Se ejecuta cuando se cambia el estado de las categorías seleccionadas.
-   * Se setea el estado selectedCategories con los ids de las categorías seleccionadas.
-   * @param categoryIds - Ids de las categorías seleccionadas.
+   * Este useEffect se ejecuta cuando hay un error en la carga de las categorías.
+   * Se setea el estado errorMessage en true y se muestra el mensaje de error.
+   * Se ejecuta un setTimeout para resetear el estado errorMessage después de 2 segundos.
    */
   useEffect(() => {
     if (apiError) {
@@ -55,9 +51,8 @@ export const FormProductCategories = ({ parsedCategories, loadingCategories, err
 
 
   /**
-   * Se ejecuta cuando se cambia el estado de las categorías seleccionadas.
-   * Se setea el estado selectedCategories con los ids de las categorías seleccionadas.
-   * @param categoryIds - Ids de las categorías seleccionadas.
+   * Este useEffect se ejecuta cuando se cambia el estado de las categorías seleccionadas.
+   * Se setea el estado showSuccess en true y se muestra el mensaje de éxito.
    */
   useEffect(() => {
     if (successState) {

@@ -18,6 +18,7 @@ import { useGetCategories } from "../category/hooks";
 import { useWizard } from "../../hooks";
 import { Wizard } from "../wizard";
 import { parseProductDataForBackend } from "./utils/productHelpers";
+import { usePatchProductCategories } from "./hooks/usePatchProductCategories";
 
 const columns: Column<ParsedProduct>[] = [
   { header: "N°", accessor: "product_id" },
@@ -43,6 +44,7 @@ export const Products = () => {
   const [productFormData, setProductFormData] = useState<ProductRequest | null>(null);
   const [productUpdateData, setProductUpdateData] = useState<ProductRequest | null>(null);
   const { postProductCategories, loading: apiLoadingPostCategories, error: apiErrorPostCategories } = usePostProductCategories();
+  const { patchProductCategories, loading: apiLoadingPatchCategories, error: apiErrorPatchCategories } = usePatchProductCategories({ dataEditProduct });
 
   const { products, parsedDataProducts, loading, error } = useGetProducts();
   const { postProduct, loading: apiLoadingPost, error: apiErrorPost } = usePostProducts();
@@ -150,6 +152,7 @@ export const Products = () => {
    */
   const onEdit = (row: ParsedProduct) => {
     setDataEditProduct(row);
+    setSelectedCategories(row.categories.map(category => category.category_id));
   }
 
 
@@ -169,14 +172,10 @@ export const Products = () => {
         description: parsedData.description !== undefined ? parsedData.description : formData.description,
         price: parsedData.price !== undefined ? parsedData.price : formData.price,
         stock: parsedData.stock !== undefined ? parsedData.stock : formData.stock,
-        active: parsedData.active !== undefined && parsedData.active === true ? "Si" : "No"
+        active: parsedData.active || formData.active
       };
 
       setProductUpdateData(productUpdateData);
-
-      console.log('productUpdateData', productUpdateData);
-
-      console.log('dataEditProduct', dataEditProduct);
 
       wizard.handleNext();
     } catch (error) {
@@ -229,6 +228,8 @@ export const Products = () => {
   const resetWizard = () => {
     setProductFormData(null);
     setSelectedCategories([]);
+    setProductUpdateData(null);
+    setDataEditProduct(null);
     wizard.resetWizard();
   }
 
@@ -275,16 +276,12 @@ export const Products = () => {
       const productResponse = await patchProduct(productUpdateData);
       if (!productResponse) throw new Error("Error al actualizar el producto");
 
-      // const createdProduct = productResponse.data[0];
-      // if (selectedCategories.length > 0) {
-      //   const productCategoryResponse = await postProductCategories(
-      //     createdProduct.product_id,
-      //     selectedCategories
-      //   );
-      //   if (!productCategoryResponse) throw new Error("Error al crear las categorías del producto");
-      // }
+      if (productResponse.data) {
+        const productCategoryResponse = await patchProductCategories(selectedCategories);
+        if (!productCategoryResponse) throw new Error("Error al actualizar las categorías del producto");
+      }
 
-      // handleSuccess("editProductModal");
+      handleSuccess("editProductModal");
     } catch (error) {
       console.log('Error al actualizar el producto', error);
     }
@@ -404,6 +401,12 @@ export const Products = () => {
               price: productUpdateData.price,
               stock: productUpdateData.stock,
               active: productUpdateData.active === "Si" ? true : false
+            } : dataEditProduct ? {
+              name: dataEditProduct.name,
+              description: dataEditProduct.description,
+              price: dataEditProduct.price,
+              stock: dataEditProduct.stock,
+              active: dataEditProduct.active === "Si" ? true : false
             } : undefined}
           />
 
@@ -416,42 +419,14 @@ export const Products = () => {
 
             successState={successState}
             successMessage="¡Producto actualizado exitosamente!"
-            apiLoading={apiLoadingPostCategories}
-            apiError={apiErrorPostCategories}
+            apiLoading={apiLoadingPatchCategories}
+            apiError={apiErrorPatchCategories}
 
             onPreviousStep={wizard.handlePrevious}
-
-            initialValues={dataEditProduct || undefined} // TODO: Debo pasarle dataEditProduct porque es quien tiene los datos de las categorías seleccionadas del registro que se va a editar, el problema es que espera un tipo de Product y le estoy enviando un ParsedProduct. Una vez que le pase un tipo Product, debo hacer que se carguen las categorías seleccionadas que tenga el registro en este componente.
           />
         </Wizard>
 
       </ModalEdit>
-
-      {/* <ModalEdit
-        id="editProductModal"
-        title="Editar producto"
-        formId="editProductForm"
-        loading={apiLoadingPatch}>
-
-        <FormProduct
-          idModal="editProductModal"
-          formId="editProductForm"
-          onSubmit={onEditSubmit}
-          apiLoading={apiLoadingPatch}
-          apiError={apiErrorPatch}
-          mode="edit"
-          success={successState}
-          successMessage="¡Producto actualizado exitosamente!"
-          initialValues={dataEditProduct ? {
-            name: dataEditProduct.name,
-            description: dataEditProduct.description,
-            price: dataEditProduct.price,
-            stock: dataEditProduct.stock,
-            active: dataEditProduct.active === "Si" ? true : false
-          } : undefined}
-        />
-
-      </ModalEdit> */}
 
       <ModalDelete
         id="deleteProductModal"
