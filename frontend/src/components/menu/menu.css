@@ -8,6 +8,8 @@
   width: 250px;
 
   background-color: rgb(51, 51, 51);
+  background-color: rgb(37, 37, 37);
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
 }
 
 .menu ul {
@@ -21,12 +23,21 @@
 
   border: 1px solid transparent;
 
-  transition: border .2s ease-in-out;
+  transition: border .2s ease-in-out, opacity .2s ease-in-out;
 }
 
 .menu ul li:hover {
+  opacity: 0.5;
   border-bottom: 1px solid rgb(151, 150, 150);
 }
+
+.menu li img {
+  width: 1.25rem;
+  height: 1.25rem;
+
+  margin-right: .5rem;
+}
+
 
 .menu li a {
   display: flex;

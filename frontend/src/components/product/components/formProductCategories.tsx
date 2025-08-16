@@ -65,7 +65,11 @@ export const FormProductCategories = ({ parsedCategories, loadingCategories, err
 
   return (
     <div>
-      <button className="btn-return" onClick={onPreviousStep}>Volver al paso anterior</button>
+      <div className="btn-previous">
+        <button onClick={onPreviousStep}>
+          <i className="fa-solid fa-arrow-left"></i> Volver al paso anterior
+        </button>
+      </div>
       <h6 className="mb-3">Selecciona las categorías a las que pertenece el producto:</h6>
       {parsedCategories.length === 0 ?
         <span className="text-muted text-center">No hay categorías disponibles. Aún así, puedes crear el producto y luego modificarlo para agregarle categorías.</span> :

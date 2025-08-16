@@ -12,3 +12,20 @@
 .table-body-categories span:last-child {
   margin-bottom: 0;
 }
+
+.btn-previous button {
+  border: none;
+  outline: none;
+
+  background-color: transparent;
+  color: black;
+
+  transition: color 0.3s ease;
+
+  margin: 0 0 1rem 0;
+  padding: .5rem;
+}
+
+.btn-previous button:hover {
+  color: #007bff;
+}
