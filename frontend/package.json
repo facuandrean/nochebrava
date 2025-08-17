@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "packageManager": "pnpm@9.15.0",
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
     "react": "^19.1.0",

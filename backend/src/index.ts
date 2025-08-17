@@ -34,8 +34,12 @@ app.use("/api/v1/item-types", itemTypeRouter);
 app.use("/api/v1/expenses", expenseRouter);
 app.use("/api/v1/expense-items", expenseItemRouter);
 
-app.listen(config.port, () => {
-  console.log(`Server is running on port 3000. http://localhost:${config.port}`);
-});
+// Para desarrollo local
+if (process.env.NODE_ENV !== 'production') {
+  const port = config.port || 3000;
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}. http://localhost:${port}`);
+  });
+}
 
 export default app;
