@@ -3,7 +3,6 @@ import { db } from "../database/database";
 import { paymentMethods } from "../database/db/paymentMethodScheme";
 import { AppError } from "../errors";
 import type { PaymentMethod, PaymentMethodBodyPost } from "../types/types";
-import { getCurrentDate } from "../utils/date";
 import { v4 as uuid } from "uuid";
 
 /**
